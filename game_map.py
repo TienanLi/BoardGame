@@ -17,27 +17,26 @@ class Room:
     def PlayerLeft(self, player):
         self.player_in_.remove(player)
 
+    # TODO: consider ghost and human
     def TriggerFight(self):
         if len(self.player_in_) <= 1:
             return
-        elif len(self.player_in_) == 2:
-            self.PlayersDeuce()
-        else:
-            self.PlayersBrawl()
+        self.PlayersBrawl()
 
-    # TODO
-    def PlayersDeuce(self):
-        return
-
-    # TODO
+    # TODO: consider ghost vs. human
     def PlayersBrawl(self):
-        return
-        # Find highest-power-score player
+        # TODO: currently only based on power, need to consider guns
+        highest_power = 0
+        for player in self.player_in_:
+            highest_power = max(highest_power, player.power_)
+        for player in self.player_in_:
+            player.ReduceLife(highest_power - player.power_)
+
 
 class GameMap:
     def __init__(self):
         self.room_list_ = {}
-        self.toxicant_level = []
+        self.toxicant_level_ = []
 
     def PlayerBorn(self, player, level_and_num):
         if level_and_num not in self.room_list_:
@@ -52,6 +51,11 @@ class GameMap:
         self.room_list_[target_level_and_num].PlayerJoin(player)
 
     def TriggerFight(self):
-        for _, room in self.room_list_:
+        for _, room in self.room_list_.items():
             room.TriggerFight()
 
+    def CountToxicGas(self, toxic_strength):
+        for level_and_num, room in self.room_list_.items():
+            if level_and_num[0] in self.toxicant_level_ and not room.is_anti_toxic_:
+                for player in room.player_in_:
+                    player.ReduceLife(toxic_strength)

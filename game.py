@@ -7,6 +7,8 @@ class Game:
         self.map_ = GameMap()
         self.round_count_ = 0
         self.GeneratePlayers(player_num)
+        # round 0, 1, 2, 3, 4, 5, 6
+        self.toxic_strengths = [0, -1, -2, -2, -3, -3, -3]
 
     def GeneratePlayers(self, player_num):
         self.players_ = []
@@ -34,19 +36,18 @@ class Game:
                 self.GetRoundResults()
             self.ProcceedOneRound()
             self.GetRoundResults()
-
-        return self.ShowFinalResults()
+        print("Game finished!")
 
     # TODO
     def ProcceedOneRound(self):
         self.round_count_ += 1
         # Randomly generate the player action order.
 
-
         # Players in the same group to swap items.
 
+        # Players actions. (make move, do lottery if needed, use special items if has);
 
-        # Player actions. (make move, do lottery if needed, use special items if has);
+        # Make some levels toxicant.
         return
 
     # TODO
@@ -58,16 +59,20 @@ class Game:
         # note: do the above two procedures first to avoid underlying player life becoming negative then positive again.
 
         # Trigger fights (human and ghost) and update player information if players are in the same room.
+        self.map_.TriggerFight()
 
         # Toxic gas.
+        self.map_.CountToxicGas(toxic_strength=self.toxic_strengths[self.round_count_])
 
         # Other Special logics.
         # Missile.
-        return
 
-    def ShowFinalResults(self):
-        return
+        self.ShowResults()
 
+    def ShowResults(self):
+        print("\n Result of round ", self.round_count_)
+        for player in self.players_:
+            player.StatusString()
 
 
 
