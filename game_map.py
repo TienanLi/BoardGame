@@ -39,12 +39,12 @@ class GameMap:
         self.room_list_ = {}
         self.toxicant_level = []
 
-    # TODO
-    def playerBorn(self):
-        return
+    def PlayerBorn(self, player, level_and_num):
+        if level_and_num not in self.room_list_:
+            self.room_list_[level_and_num] = Room(level_and_num[0], level_and_num[1])
+        self.room_list_[level_and_num].PlayerJoin(player)
 
     # TODO: build adjacent matrix to determine the distance of rooms automatically (and add auto step num judgement).
-    # TODO: make level and room_num auto-extracted from an input string.
     def PlayerMove(self, player, original_level_and_num, target_level_and_num):
         self.room_list_[original_level_and_num].PlayerLeft(player)
         if target_level_and_num not in self.room_list_:
