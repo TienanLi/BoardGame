@@ -73,8 +73,7 @@ class Game:
                 item_name = input("Enter the item name, if you pick any: (Press enter to skip)")
                 if not item_name:
                     break
-                if not player.PickItem(item_name):
-                    break
+                player.PickItem(item_name)
             # TODO: player use special item.
 
             # Vote for toxicant level.
@@ -111,18 +110,27 @@ class Game:
     def GetRoundResults(self):
         if self.round_count_ != 0:
             # Water and Food. (Input)
-            for player in self.players_:
-                print("\n Player", player.name_)
-                if player.ItemInBag("water"):
-                    use_water = input("Do you want to use water? (Press enter to skip)")
-                    if use_water:
-                        player.IncreaseLife(1)
-                        player.UseItem("water")
-                if player.ItemInBag("food"):
-                    use_food = input("Do you want to use food? (Press enter to skip)")
-                    if use_food:
-                        player.IncreaseLife(1)
-                        player.UseItem("food")
+            if self.round_count_ >= 2:
+                for player in self.players_:
+                    print("\n Player", player.name_)
+                    # The special version from airdrop.
+                    use_water_and_food = False
+                    if player.ItemInBag("water_and_food"):
+                        use_water_and_food = input("Do you want to use the water_and_food? (Press enter to skip)")
+                        if use_water_and_food:
+                            player.IncreaseLife(2)
+                            player.UseItem("water_and_food")
+                    # Regular version.
+                    if not use_water_and_food and player.ItemInBag("water"):
+                        use_water = input("Do you want to use water? (Press enter to skip)")
+                        if use_water:
+                            player.IncreaseLife(1)
+                            player.UseItem("water")
+                    if not use_water_and_food and player.ItemInBag("food"):
+                        use_food = input("Do you want to use food? (Press enter to skip)")
+                        if use_food:
+                            player.IncreaseLife(1)
+                            player.UseItem("food")
             # Pills and Epinephrine. (Input)
             for player in self.players_:
                 print("\n Player", player.name_)

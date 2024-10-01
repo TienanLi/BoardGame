@@ -1,4 +1,4 @@
-from items import Item, kWeaponDict
+from items import Item, kWeaponDict, kItemList
 
 class Player:
     # TODO: assert sum is 10
@@ -69,11 +69,14 @@ class Player:
         return True
 
     def PickItem(self, item_name):
+        if item_name not in kItemList:
+            print("Not a legal item name. See the full item list:")
+            print(kItemList)
+            return
         if len(self.bag_) == self.bag_size_:
             print("Bag is already full. Can not pick this one.\n")
-            return False
+            return
         self.bag_.append(Item(item_name))
-        return True
 
     def PowerWithWeapon(self):
         temp_power = self.power_
