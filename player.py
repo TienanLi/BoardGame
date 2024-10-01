@@ -43,6 +43,7 @@ class Player:
         self.life_ -= num_reduced
         if self.use_epinephrine_:
             self.life_ = max(1, self.life_)
+        # TODO: ghost location reset mechanism.
         if self.life_ <= 0:
             self.is_ghost_ = True
             self.life_ = 0

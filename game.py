@@ -11,7 +11,9 @@ class Game:
         self.round_count_ = 0
         self.GeneratePlayers(player_num)
         # round 0, 1, 2, 3, 4, 5, 6
-        self.toxic_strengths_ = [0, 1, 2, 2, 3, 3, 3]
+        self.toxic_strengths_ = [0, 1, 2, 2, 3, 3, 4]
+        # for recycling machine.
+        self.used_consumables = []
 
     def GeneratePlayers(self, player_num):
         self.players_ = []
@@ -58,6 +60,7 @@ class Game:
 
         # Players actions.
         self.vote_count_for_toxic_ = defaultdict(int)
+        self.bazooka_level_and_room_num_ = None
         for player in self.players_:
             # Player moves.
             print("\n Player", player.name_)
@@ -74,7 +77,12 @@ class Game:
                 if not item_name:
                     break
                 player.PickItem(item_name)
+
             # TODO: player use special item.
+            if player.ItemInBag("bazooka"):
+                target_level = input("Decide your target attack level: ")
+                target_room_num = input("Decide your target attack room num: ")
+                self.bazooka_level_and_room_num_ = (target_level, target_room_num)
 
             # Vote for toxicant level.
             while True:
@@ -111,51 +119,63 @@ class Game:
         if self.round_count_ != 0:
             # Water and Food. (Input)
             if self.round_count_ >= 2:
-                for player in self.players_:
-                    print("\n Player", player.name_)
-                    # The special version from airdrop.
-                    use_water_and_food = False
-                    if player.ItemInBag("water_and_food"):
-                        use_water_and_food = input("Do you want to use the water_and_food? (Press enter to skip)")
-                        if use_water_and_food:
-                            player.IncreaseLife(2)
-                            player.UseItem("water_and_food")
-                    # Regular version.
-                    if not use_water_and_food and player.ItemInBag("water"):
-                        use_water = input("Do you want to use water? (Press enter to skip)")
-                        if use_water:
-                            player.IncreaseLife(1)
-                            player.UseItem("water")
-                    if not use_water_and_food and player.ItemInBag("food"):
-                        use_food = input("Do you want to use food? (Press enter to skip)")
-                        if use_food:
-                            player.IncreaseLife(1)
-                            player.UseItem("food")
+                self.WaterAndFood()
             # Pills and Epinephrine. (Input)
-            for player in self.players_:
-                print("\n Player", player.name_)
-                if player.ItemInBag("pill"):
-                    use_pill = input("Do you want to use pill? (Press enter to skip)")
-                    if use_pill:
-                        player.IncreaseLife(2)
-                        player.UseItem("pill")
-                if player.ItemInBag("epinephrine"):
-                    use_epinephrine = input("Do you want to use epinephrine? (Press enter to skip)")
-                    if use_epinephrine:
-                        player.UseItem("epinephrine")
-                        player.consumeEpinephrine()
-                        # TODO: make it functional
-
-        # Trigger fights (human and ghost) and update player information if players are in the same room.
-        self.map_.TriggerFight()
+            self.PillAndEpinephrine()
 
         # Toxic gas.
         self.map_.PlayerHurtByToxicGas(toxic_strength=self.toxic_strengths_[self.round_count_])
 
         # Other Special logics.
-        # Missile.
+        if self.bazooka_level_and_room_num_:
+            self.map_.RoomAttackedByBazooka(self.bazooka_level_and_room_num_)
+
+        # Trigger fights (human and ghost) and update player information if players are in the same room.
+        # note: trigger fight at the end so ghost is not changed until the end, thus not impacted by any physical
+        # hurts in this round (e.g. toxic gas, bazooka).
+        self.map_.TriggerFight()
 
         self.ShowResults()
+
+    def WaterAndFood(self):
+        for player in self.players_:
+            if player.is_ghost_:
+                continue
+            print("\n Player", player.name_)
+            # The special version from airdrop.
+            use_water_and_food = False
+            if player.ItemInBag("water_and_food"):
+                use_water_and_food = input("Do you want to use the water_and_food? (Press enter to skip)")
+                if use_water_and_food:
+                    player.IncreaseLife(2)
+                    player.UseItem("water_and_food")
+            # Regular version.
+            if not use_water_and_food and player.ItemInBag("water"):
+                use_water = input("Do you want to use water? (Press enter to skip)")
+                if use_water:
+                    player.IncreaseLife(1)
+                    player.UseItem("water")
+            if not use_water_and_food and player.ItemInBag("food"):
+                use_food = input("Do you want to use food? (Press enter to skip)")
+                if use_food:
+                    player.IncreaseLife(1)
+                    player.UseItem("food")
+
+    def PillAndEpinephrine(self):
+        for player in self.players_:
+            if player.is_ghost_:
+                continue
+            print("\n Player", player.name_)
+            if player.ItemInBag("pill"):
+                use_pill = input("Do you want to use pill? (Press enter to skip)")
+                if use_pill:
+                    player.IncreaseLife(2)
+                    player.UseItem("pill")
+            if player.ItemInBag("epinephrine"):
+                use_epinephrine = input("Do you want to use epinephrine? (Press enter to skip)")
+                if use_epinephrine:
+                    player.UseItem("epinephrine")
+                    player.consumeEpinephrine()
 
     def ShowResults(self):
         print("\n Result of round ", self.round_count_)

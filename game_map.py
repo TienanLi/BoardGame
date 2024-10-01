@@ -19,6 +19,7 @@ class Room:
         self.player_in_.remove(player)
 
     def TriggerFight(self):
+        # TODO: operation room mechanism.
         if self.HasAnyoneHasGun():
             self.HumanBrawlWithGun()
         else:
@@ -98,3 +99,9 @@ class GameMap:
             if level_and_num[0] in self.toxicant_level_ and not room.is_anti_toxic_:
                 for player in room.player_in_:
                     player.ReduceLife(toxic_strength)
+
+    def RoomAttackedByBazooka(self, level_and_num):
+        if level_and_num not in self.room_list_:
+            return
+        for player in self.room_list_[level_and_num].player_in_:
+            player.ReduceLife(4)
