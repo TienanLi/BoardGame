@@ -17,22 +17,30 @@ class Room:
     def PlayerLeft(self, player):
         self.player_in_.remove(player)
 
-    # TODO: consider ghost and human
     def TriggerFight(self):
-        if len(self.player_in_) <= 1:
-            return
-        self.PlayersBrawl()
+        self.HumanBrawl()
+        self.GhostBloodSucking()
 
-    # TODO: consider ghost vs. human
-    def PlayersBrawl(self):
+    def HumanBrawl(self):
         # TODO: currently only based on power, need to consider guns
         highest_power = 0
         for player in self.player_in_:
+            if player.is_ghost_:
+                continue
             highest_power = max(highest_power, player.power_)
         for player in self.player_in_:
+            if player.is_ghost_:
+                continue
             player.ReduceLife(highest_power - player.power_)
-
-
+    
+    def GhostBloodSucking(self):
+        ghosts = [player for player in self.player_in_ if player.is_ghost_]
+        humans = [player for player in self.player_in_ if not player.is_ghost_]
+        for ghost in ghosts:
+            ghost.IncreaseLife(len(humans))
+        for human in humans:
+            human.ReduceLife(len(ghosts))
+    
 class GameMap:
     def __init__(self):
         self.room_list_ = {}
@@ -55,6 +63,7 @@ class GameMap:
 
     def TriggerFight(self):
         for _, room in self.room_list_.items():
+            # TODO: exclude operating room
             room.TriggerFight()
 
     def PlayerHurtByToxicGas(self, toxic_strength):

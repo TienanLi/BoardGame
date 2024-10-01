@@ -113,8 +113,6 @@ class Game:
         print("Toxic gas are filled in level: ", level_string)
 
 
-
-
 if __name__ == '__main__':
     player_num = input("Enter the player num: ")
     new_game = Game(int(player_num))
