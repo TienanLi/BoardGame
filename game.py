@@ -60,7 +60,13 @@ class Game:
             level = input("Decide your target level: ")
             target_room_num = input("Decide your target room num: ")
             self.map_.PlayerMove(player, (level, target_room_num))
-            # TODO: player do lottery.
+            # TODO: automatically do lottery.
+            # Moderator help do the lottery and player pick items from the room.
+            while True:
+                item_name = input("Enter the item name, if you pick any: (Press enter to skip)")
+                if not item_name:
+                    break
+                player.PickItem(item_name)
             # TODO: player use special item.
 
             # Vote for toxicant level.
@@ -86,20 +92,29 @@ class Game:
 
 
     def GetRoundResults(self):
-        # Water and Food. (Input)
-        for player in self.players_:
-            # Player moves.
-            print("\n Player", player.name_)
-            use_water = input("Do you want to use water?")
-            if use_water:
-                player.IncreaseLife(1)
-            use_food = input("Do you want to use food?")
-            if use_food:
-                player.IncreaseLife(1)
-
-        # Pills and Epinephrine. (Input)
-
-        # note: do the above two procedures first to avoid underlying player life becoming negative then positive again.
+        if self.round_count_ != 0:
+            # Water and Food. (Input)
+            for player in self.players_:
+                print("\n Player", player.name_)
+                use_water = input("Do you want to use water? (Press enter to skip)")
+                if use_water:
+                    player.IncreaseLife(1)
+                    player.UseItem("water")
+                use_food = input("Do you want to use food? (Press enter to skip)")
+                if use_food:
+                    player.IncreaseLife(1)
+                    player.UseItem("food")
+            # Pills and Epinephrine. (Input)
+            for player in self.players_:
+                print("\n Player", player.name_)
+                use_pill = input("Do you want to use pills? (Press enter to skip)")
+                if use_pill:
+                    player.IncreaseLife(2)
+                    player.UseItem("pill")
+                use_epinephrine = input("Do you want to use Epinephrine? (Press enter to skip)")
+                if use_epinephrine:
+                    player.UseItem("use_epinephrine")
+                    # TODO: make it funcational
 
         # Trigger fights (human and ghost) and update player information if players are in the same room.
         self.map_.TriggerFight()

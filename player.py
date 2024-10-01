@@ -1,3 +1,5 @@
+from items import Item
+
 class Player:
     # TODO: assert sum is 10
     def __init__(self, name, power, movement, bag_size):
@@ -33,5 +35,17 @@ class Player:
 
     def IncreaseLife(self, num_increased):
         self.life_ += num_increased
+        self.life_ = max(self.life_, 10)
         if (self.is_ghost_ == True and self.life_ >= 2):
             self.is_ghost_ = False
+
+    def UseItem(self, item_name):
+        # TODO: return false if the item not is in the bag.
+        for i in range(len(self.bag_)):
+            if self.bag_[i].name_ == item_name:
+                self.bag_.pop(i)
+                break
+
+    def PickItem(self, item_name):
+        # TODO: return false if the bag is full
+        self.bag_.append(Item(item_name))
