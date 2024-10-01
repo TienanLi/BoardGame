@@ -18,10 +18,15 @@ class Game:
         for i in range(player_num):
             print("\nPlayer", i, " please input your initial gene." )
             name = input("Enter your name: ")
-            power = input("Decide your power capability: ")
-            movement = input("Decide your movement capability: ")
-            bag_size = input("Decide your bag size: ")
+            while True:
+                power = int(input("Decide your power capability: "))
+                movement = int(input("Decide your movement capability: "))
+                bag_size = int(input("Decide your bag size: "))
+                if power + movement + bag_size == 10:
+                    break
+                print("Sum is not 10. Please re-input.\n")
             self.players_.append(Player(name, int(power), int(movement), int(bag_size)))
+
 
     def SelectPlayerBornLocation(self):
         for player in self.players_:
@@ -41,7 +46,6 @@ class Game:
             self.GetRoundResults()
         print("Game finished!")
 
-    # TODO
     def ProcceedOneRound(self):
         self.round_count_ += 1
         # Randomly shuffle the player action order.
@@ -57,21 +61,28 @@ class Game:
         for player in self.players_:
             # Player moves.
             print("\n Player", player.name_)
-            level = input("Decide your target level: ")
-            target_room_num = input("Decide your target room num: ")
-            self.map_.PlayerMove(player, (level, target_room_num))
+            while True:
+                level = input("Decide your target level: ")
+                target_room_num = input("Decide your target room num: ")
+                if self.map_.PlayerMove(player, (level, target_room_num)):
+                    break
+
             # TODO: automatically do lottery.
             # Moderator help do the lottery and player pick items from the room.
             while True:
                 item_name = input("Enter the item name, if you pick any: (Press enter to skip)")
                 if not item_name:
                     break
-                player.PickItem(item_name)
+                if not player.PickItem(item_name):
+                    break
             # TODO: player use special item.
 
             # Vote for toxicant level.
-            # TODO: do not allow voting for the same levels.
-            level = input("Vote for the level you want to toxify: ")
+            while True:
+                level = input("Vote for the level you want to toxify: ")
+                if level not in self.map_.toxicant_level_:
+                    break
+                print("This level is already filled with toxic gas. Please re-input.\n")
             self.vote_count_for_toxic_[level] += 1
 
         # Make some levels filled with toxic gas.
@@ -96,25 +107,29 @@ class Game:
             # Water and Food. (Input)
             for player in self.players_:
                 print("\n Player", player.name_)
-                use_water = input("Do you want to use water? (Press enter to skip)")
-                if use_water:
-                    player.IncreaseLife(1)
-                    player.UseItem("water")
-                use_food = input("Do you want to use food? (Press enter to skip)")
-                if use_food:
-                    player.IncreaseLife(1)
-                    player.UseItem("food")
+                if player.ItemInBag("water"):
+                    use_water = input("Do you want to use water? (Press enter to skip)")
+                    if use_water:
+                        player.IncreaseLife(1)
+                        player.UseItem("water")
+                if player.ItemInBag("food"):
+                    use_food = input("Do you want to use food? (Press enter to skip)")
+                    if use_food:
+                        player.IncreaseLife(1)
+                        player.UseItem("food")
             # Pills and Epinephrine. (Input)
             for player in self.players_:
                 print("\n Player", player.name_)
-                use_pill = input("Do you want to use pills? (Press enter to skip)")
-                if use_pill:
-                    player.IncreaseLife(2)
-                    player.UseItem("pill")
-                use_epinephrine = input("Do you want to use Epinephrine? (Press enter to skip)")
-                if use_epinephrine:
-                    player.UseItem("use_epinephrine")
-                    # TODO: make it funcational
+                if player.ItemInBag("pill"):
+                    use_pill = input("Do you want to use pill? (Press enter to skip)")
+                    if use_pill:
+                        player.IncreaseLife(2)
+                        player.UseItem("pill")
+                if player.ItemInBag("epinephrine"):
+                    use_epinephrine = input("Do you want to use epinephrine? (Press enter to skip)")
+                    if use_epinephrine:
+                        player.UseItem("epinephrine")
+                        # TODO: make it functional
 
         # Trigger fights (human and ghost) and update player information if players are in the same room.
         self.map_.TriggerFight()

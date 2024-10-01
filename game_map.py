@@ -7,6 +7,7 @@ class Room:
         # Helicopter station is auto anti-toxic
         self.is_anti_toxic_ = True if (level == 2 and room_num == 2) else False
         self.player_in_ = []
+        self.item_in_ = []
 
     def MakeAntiToxic(self):
         self.is_anti_toxic_ = True
@@ -55,11 +56,15 @@ class GameMap:
     # TODO: build adjacent matrix to determine the distance of rooms automatically (and add auto step num judgement).
     def PlayerMove(self, player, target_level_and_num):
         original_level_and_num = player.location_
+        if original_level_and_num == target_level_and_num:
+            print("Can not stay in the same room. Please re-input.\n")
+            return False
         self.room_list_[original_level_and_num].PlayerLeft(player)
         if target_level_and_num not in self.room_list_:
             self.room_list_[target_level_and_num] = Room(target_level_and_num[0], target_level_and_num[1])
         self.room_list_[target_level_and_num].PlayerJoin(player)
         player.location_ = target_level_and_num
+        return True
 
     def TriggerFight(self):
         for _, room in self.room_list_.items():
