@@ -84,9 +84,15 @@ class Game:
                     break
                 print("This level is already filled with toxic gas. Please re-input.\n")
             self.vote_count_for_toxic_[level] += 1
+        # Epinephrine faded our after the player moves.
+        self.AllPlayerEpinephrineFade()
 
         # Make some levels filled with toxic gas.
         self.ToxifySomeLevels()
+
+    def AllPlayerEpinephrineFade(self):
+        for player in self.players_:
+            player.EpinephrineFade()
 
     def ToxifySomeLevels(self):
         max_vote_num = 0
@@ -129,6 +135,7 @@ class Game:
                     use_epinephrine = input("Do you want to use epinephrine? (Press enter to skip)")
                     if use_epinephrine:
                         player.UseItem("epinephrine")
+                        player.consumeEpinephrine()
                         # TODO: make it functional
 
         # Trigger fights (human and ghost) and update player information if players are in the same room.

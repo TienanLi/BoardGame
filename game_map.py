@@ -75,6 +75,7 @@ class GameMap:
         player.location_ = level_and_num
 
     # TODO: build adjacent matrix to determine the distance of rooms automatically (and add auto step num judgement).
+    # Also need to consider epinephrine in the step judge.
     def PlayerMove(self, player, target_level_and_num):
         original_level_and_num = player.location_
         if original_level_and_num == target_level_and_num:

@@ -9,6 +9,7 @@ class Player:
         self.bag_size_ = bag_size
         self.bag_ = []
         self.life_ = 10
+        self.use_epinephrine_ = False
         self.is_ghost_ = False
         self.location_ = None
 
@@ -32,9 +33,17 @@ class Player:
         self.bag_size_ = bag_size
         return True
 
+    def consumeEpinephrine(self):
+        self.use_epinephrine_ = True
+
+    def EpinephrineFade(self):
+        self.use_epinephrine_ = False
+
     def ReduceLife(self, num_reduced):
         self.life_ -= num_reduced
-        if (self.life_ <= 0):
+        if self.use_epinephrine_:
+            self.life_ = max(1, self.life_)
+        if self.life_ <= 0:
             self.is_ghost_ = True
             self.life_ = 0
 

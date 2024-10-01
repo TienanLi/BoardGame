@@ -10,5 +10,5 @@ class Item:
         return "gun" in self.name_
 
     @staticmethod
-    def is_weapon(self, name):
+    def is_weapon(name):
         return True if name in kWeaponDict else False
