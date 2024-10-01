@@ -19,20 +19,41 @@ class Room:
         self.player_in_.remove(player)
 
     def TriggerFight(self):
-        self.HumanBrawl()
+        if self.HasAnyoneHasGun():
+            self.HumanBrawlWithGun()
+        else:
+            self.HumanBrawlWithoutGun()
         self.GhostBloodSucking()
 
-    def HumanBrawl(self):
-        # TODO: currently only based on power, need to consider guns
+    def HasAnyoneHasGun(self):
+        for player in self.player_in_:
+            if player.HasGun():
+                return True
+        return False
+
+    def HumanBrawlWithGun(self):
+        player_with_gun = []
+        for player in self.player_in_:
+            if player.HasGun():
+                player_with_gun.append(player)
+        highest_power = 0
+        for player in player_with_gun:
+            highest_power = max(highest_power, player.PowerWithWeapon())
+        for player in self.player_in_:
+            if player.is_ghost_:
+                continue
+            player.ReduceLife(highest_power - (player.PowerWithWeapon() if player.HasGun() else 0))
+
+    def HumanBrawlWithoutGun(self):
         highest_power = 0
         for player in self.player_in_:
             if player.is_ghost_:
                 continue
-            highest_power = max(highest_power, player.power_)
+            highest_power = max(highest_power, player.PowerWithWeapon())
         for player in self.player_in_:
             if player.is_ghost_:
                 continue
-            player.ReduceLife(highest_power - player.power_)
+            player.ReduceLife(highest_power - player.PowerWithWeapon())
     
     def GhostBloodSucking(self):
         ghosts = [player for player in self.player_in_ if player.is_ghost_]

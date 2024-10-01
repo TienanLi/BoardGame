@@ -1,4 +1,4 @@
-from items import Item
+from items import Item, kWeaponDict
 
 class Player:
     # TODO: assert sum is 10
@@ -65,3 +65,16 @@ class Player:
             return False
         self.bag_.append(Item(item_name))
         return True
+
+    def PowerWithWeapon(self):
+        temp_power = self.power_
+        for item in self.bag_:
+            if item.name_ in kWeaponDict:
+                temp_power += kWeaponDict[item.name_]
+        return temp_power
+
+    def HasGun(self):
+        for item in self.bag_:
+            if item.is_gun():
+                return True
+        return False
