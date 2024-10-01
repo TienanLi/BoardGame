@@ -42,19 +42,22 @@ class GameMap:
         if level_and_num not in self.room_list_:
             self.room_list_[level_and_num] = Room(level_and_num[0], level_and_num[1])
         self.room_list_[level_and_num].PlayerJoin(player)
+        player.location_ = level_and_num
 
     # TODO: build adjacent matrix to determine the distance of rooms automatically (and add auto step num judgement).
-    def PlayerMove(self, player, original_level_and_num, target_level_and_num):
+    def PlayerMove(self, player, target_level_and_num):
+        original_level_and_num = player.location_
         self.room_list_[original_level_and_num].PlayerLeft(player)
         if target_level_and_num not in self.room_list_:
             self.room_list_[target_level_and_num] = Room(target_level_and_num[0], target_level_and_num[1])
         self.room_list_[target_level_and_num].PlayerJoin(player)
+        player.location_ = target_level_and_num
 
     def TriggerFight(self):
         for _, room in self.room_list_.items():
             room.TriggerFight()
 
-    def CountToxicGas(self, toxic_strength):
+    def PlayerHurtByToxicGas(self, toxic_strength):
         for level_and_num, room in self.room_list_.items():
             if level_and_num[0] in self.toxicant_level_ and not room.is_anti_toxic_:
                 for player in room.player_in_:

@@ -8,6 +8,7 @@ class Player:
         self.bag_ = []
         self.life_ = 10
         self.is_ghost_ = False
+        self.location_ = None
 
     def StatusString(self):
         print("Player ", self.name_, " current life ", self.life_, " and is a ", "ghost" if self.is_ghost_ else "human")

@@ -1,3 +1,6 @@
+from collections import defaultdict
+from random import shuffle
+
 from game_map import GameMap
 from player import Player
 
@@ -8,7 +11,7 @@ class Game:
         self.round_count_ = 0
         self.GeneratePlayers(player_num)
         # round 0, 1, 2, 3, 4, 5, 6
-        self.toxic_strengths = [0, -1, -2, -2, -3, -3, -3]
+        self.toxic_strengths_ = [0, 1, 2, 2, 3, 3, 3]
 
     def GeneratePlayers(self, player_num):
         self.players_ = []
@@ -41,14 +44,45 @@ class Game:
     # TODO
     def ProcceedOneRound(self):
         self.round_count_ += 1
-        # Randomly generate the player action order.
+        # Randomly shuffle the player action order.
+        shuffle(self.players_)
+        print("\nRound ", self.round_count_, "\nThe order of player execution in this round is: ")
+        for player in self.players_:
+            print(player.name_)
 
-        # Players in the same group to swap items.
+        # TODO: Players in the same group to swap items.
 
-        # Players actions. (make move, do lottery if needed, use special items if has);
+        # Players actions.
+        self.vote_count_for_toxic_ = defaultdict(int)
+        for player in self.players_:
+            # Player moves.
+            print("\n Player", player.name_)
+            level = input("Decide your target level: ")
+            target_room_num = input("Decide your target room num: ")
+            self.map_.PlayerMove(player, (level, target_room_num))
+            # TODO: player do lottery.
+            # TODO: player use special item.
 
-        # Make some levels toxicant.
-        return
+            # Vote for toxicant level.
+            # TODO: do not allow voting for the same levels.
+            level = input("Vote for the level you want to toxify: ")
+            self.vote_count_for_toxic_[level] += 1
+
+        # Make some levels filled with toxic gas.
+        self.ToxifySomeLevels()
+
+    def ToxifySomeLevels(self):
+        max_vote_num = 0
+        most_voted_level = []
+        for level, vote in self.vote_count_for_toxic_.items():
+            if vote > max_vote_num:
+                max_vote_num = vote
+                most_voted_level = [level]
+            elif vote == max_vote_num:
+                most_voted_level.append(level)
+
+        for level in most_voted_level:
+            self.map_.toxicant_level_.append(level)
 
     # TODO
     def GetRoundResults(self):
@@ -62,7 +96,7 @@ class Game:
         self.map_.TriggerFight()
 
         # Toxic gas.
-        self.map_.CountToxicGas(toxic_strength=self.toxic_strengths[self.round_count_])
+        self.map_.PlayerHurtByToxicGas(toxic_strength=self.toxic_strengths_[self.round_count_])
 
         # Other Special logics.
         # Missile.
@@ -73,6 +107,11 @@ class Game:
         print("\n Result of round ", self.round_count_)
         for player in self.players_:
             player.StatusString()
+        level_string = ""
+        for level in self.map_.toxicant_level_:
+            level_string += level + " "
+        print("Toxic gas are filled in level: ", level_string)
+
 
 
 
