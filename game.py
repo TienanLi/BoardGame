@@ -84,9 +84,18 @@ class Game:
         for level in most_voted_level:
             self.map_.toxicant_level_.append(level)
 
-    # TODO
+
     def GetRoundResults(self):
         # Water and Food. (Input)
+        for player in self.players_:
+            # Player moves.
+            print("\n Player", player.name_)
+            use_water = input("Do you want to use water?")
+            if use_water:
+                player.IncreaseLife(1)
+            use_food = input("Do you want to use food?")
+            if use_food:
+                player.IncreaseLife(1)
 
         # Pills and Epinephrine. (Input)
 
