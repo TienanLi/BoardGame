@@ -8,7 +8,7 @@ from player import Player
 class Game:
     def __init__(self):
         self.map_ = GameMap()
-        self.map_.GenerateMap()
+        # self.map_.GenerateMap()
         self.round_count_ = 0
         self.GeneratePlayers()
         # round 0, 1, 2, 3, 4, 5, 6
