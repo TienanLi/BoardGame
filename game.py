@@ -6,17 +6,19 @@ from player import Player
 
 # Big TODO: use a graphic interface.
 class Game:
-    def __init__(self, player_num):
+    def __init__(self):
         self.map_ = GameMap()
+        self.map_.GenerateMap()
         self.round_count_ = 0
-        self.GeneratePlayers(player_num)
+        self.GeneratePlayers()
         # round 0, 1, 2, 3, 4, 5, 6
         self.toxic_strengths_ = [0, 1, 2, 2, 3, 3, 4]
         # for recycling machine.
         self.used_consumables = []
         self.bazooka_level_and_room_num_ = None
 
-    def GeneratePlayers(self, player_num):
+    def GeneratePlayers(self):
+        player_num = input("Enter the player num: ")
         self.players_ = []
         for i in range(player_num):
             print("\nPlayer", i, " please input your initial gene." )
@@ -34,10 +36,16 @@ class Game:
     def SelectPlayerBornLocation(self):
         for player in self.players_:
             print("\n Player", player.name_)
-            # TODO: make level and room_num auto-extracted from an input string.
-            level = input("Decide your born level: ")
-            born_room_num = input("Decide your born room num: ")
-            self.map_.PlayerBorn(player, (level, born_room_num))
+            born_room = input("Decide your born room: ").lower()
+            # remove all spaces between characters
+            born_room = "".join(born_room.split())
+            # check in the map if the born room type is BORN_ROOM
+            born_level_num, born_room_num = self.map_.ParseRoomString(born_room)
+            while not self.map_.RoomIsBornRoom((born_level_num, born_room_num)):
+                born_room = input("Invalid born room. Please re-enter your born room: ").lower()
+            # parse the level of the room
+            born_level_num, born_room_num = self.map_.ParseRoomString(born_room)
+            self.map_.PlayerBorn(player, (born_level_num, born_room_num))
 
     def Proceed(self):
         while self.round_count_ < 6:
@@ -189,6 +197,5 @@ class Game:
 
 
 if __name__ == '__main__':
-    player_num = input("Enter the player num: ")
-    new_game = Game(int(player_num))
+    new_game = Game()
     new_game.Proceed()

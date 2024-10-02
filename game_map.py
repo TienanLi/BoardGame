@@ -1,4 +1,11 @@
-from player import Player
+from enum import Enum
+
+class RoomType(Enum):
+    NO_TYPE = 0
+    BORN_ROOM = 1
+    OPERATING_ROOM = 2
+    HELICOPTER_STATION = 3
+    # TODO: add more types
 
 class Room:
     def __init__(self, level, room_num):
@@ -8,6 +15,12 @@ class Room:
         self.is_anti_toxic_ = True if (level == 2 and room_num == 2) else False
         self.player_in_ = []
         self.item_in_ = []
+        self.type_ = RoomType.NO_TYPE
+        # i need a map that maps the room index to the room level and room number
+        self.room_index2levelroom_map_ = {}
+        self.room_levelroom2index_map_ = {}
+        # i need a map that maps the room index to the room object
+        self.room_levelroom2object_map_ = {}
 
     def MakeAntiToxic(self):
         self.is_anti_toxic_ = True
@@ -68,6 +81,13 @@ class GameMap:
     def __init__(self):
         self.room_list_ = {}
         self.toxicant_level_ = []
+        # We only support [-9,9] levels and [00,99] rooms.`
+        self.map_adj_matrix_ = {}
+
+    def RoomIsBornRoom(self, level_and_num):
+        if level_and_num not in self.room_list_:
+            self.room_list_[level_and_num] = Room(level_and_num[0], level_and_num[1])
+        self.room_list_[level_and_num].type_ = RoomType.BORN_ROOM
 
     def PlayerBorn(self, player, level_and_num):
         if level_and_num not in self.room_list_:
@@ -75,8 +95,72 @@ class GameMap:
         self.room_list_[level_and_num].PlayerJoin(player)
         player.location_ = level_and_num
 
+    def ParseRoomString(self, room_input_str):
+        if room_input_str[0].isdigit():
+            level = int(room_input_str[0])
+            room  = int(room_input_str)
+        else:
+            level = -int(room_input_str[1])
+            room  = int(room_input_str[1:])
+        print("Level: ", level, " Room: ", room)
+        return level, room
+
     # TODO: build adjacent matrix to determine the distance of rooms automatically (and add auto step num judgement).
     # Also need to consider epinephrine in the step judge.
+    # create the adjacent matrix for rooms and the distance between rooms.
+    def GenerateMap(self):
+        print("Create the map.\n")
+        level_num_above_ground = input("Enter the levels above the ground: ")
+        level_num_under_ground = input("Enter the levels under the ground: ")
+        for i in range(int(level_num_above_ground), -int(level_num_under_ground), -1):
+            if i == 0:
+                continue
+            print("Level ", i, "\n")
+            add_in_batch = input("Add in batch? (Press Y to start or N to skip)").lower()
+            if add_in_batch == "y":
+                while True:
+                    room_num_start = input("Add in batch. Enter the room start in level " + str(i) + ": ")
+                    if len(room_num_start) > 2:
+                        room_num_start = room_num_start[-2:]
+                    room_num_end = input("Add in batch. Enter the room end in level " + str(i) + ": ")
+                    if len(room_num_end) > 2:
+                        room_num_end = room_num_end[-2:]
+                    # flip start and end if start is larger than end
+                    if int(room_num_start) > int(room_num_end):
+                        room_num_start, room_num_end = room_num_end, room_num_start
+                    # add rooms to the map
+                    room_list_temp = ""
+                    for j in range(int(room_num_start), int(room_num_end) + 1):
+                        if i < 0:
+                            room_list_temp += "B%d%02d " % (abs(i), j)
+                        else:
+                            room_list_temp += "%i%02d " % (i, j)
+                        pass
+                    print("Rooms added: ", room_list_temp)
+
+                    finished_adding = input("Another batch? (Press Y to start or N to skip)").lower()
+                    if finished_adding == "n":
+                        break
+
+            add_by_individual = input("Add by individual? (Press Y to start or N to skip)").lower()
+            if add_by_individual == "y":
+                while True:
+                    room_num = input("Enter the room num in level " + str(i) + ": ")
+                    if len(room_num) > 2:
+                        room_num = room_num[-2:]
+                    if i < 0:
+                        print("Rooms added: B%d%02d " % (abs(i), int(room_num)))
+                    else:
+                        print("Rooms added: %d%02d " % (i, int(room_num)))
+                    pass
+                    # add room to the map
+                    finished_adding = input("Continue adding rooms in level " + str(i) + "? (Press Y to continue or N to skip)")
+                    if finished_adding == "n":
+                        break
+
+    def BuildMapAdjMatrix(self):
+        pass
+
     def PlayerMove(self, player, target_level_and_num):
         original_level_and_num = player.location_
         if original_level_and_num == target_level_and_num:
