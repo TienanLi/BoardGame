@@ -64,14 +64,38 @@ class Game:
         for player in self.players_:
             print(player.name_)
 
-        # TODO: Players in the same group to swap items.
-
         # Players actions.
         self.vote_count_for_toxic_ = defaultdict(int)
         self.bazooka_level_and_room_num_ = None
         for player in self.players_:
-            # Player moves.
             print("\n Player", player.name_)
+
+            # TODO: make it a stand-alone/jump-in section?
+            # Report the item exchanges.
+            while True:
+                has_item_reported = input("Do you want to report any item exchange?")
+                if not has_item_reported:
+                    break
+                while True:
+                    exchange_type = input("Do you want to report give/receive/exchange?").lower()
+                    # TODO: add anti-duplication mechanism.
+                    if exchange_type == "give":
+                        to_player = input("To whom?")
+                        item = input("What item?")
+                        self.PlayerGiveItem(player, to_player, item)
+                    elif exchange_type == "receive":
+                        from_player= input("From whom?")
+                        item = input("What item?")
+                        self.PlayerGiveItem(from_player, player, item)
+                    elif exchange_type == "exchange":
+                        exchange_player= input("With whom?")
+                        item_give = input("What item you give?")
+                        item_receive = input("What item you receive?")
+                        self.PlayerExchangeItem(player, exchange_player, item_give, item_receive)
+                    else:
+                        print("Please input one of the exchange types.")
+
+            # Player moves.
             while True:
                 room = input("Decide your target room: ").lower()
                 level, target_room_num = self.map_.ParseRoomString(room)
@@ -104,6 +128,14 @@ class Game:
         self.AllPlayerEpinephrineFade()
         # Make some levels filled with toxic gas.
         self.ToxifySomeLevels()
+
+    # TODO
+    def PlayerGiveItem(self, from_player, to_player, item):
+        return
+
+    # TODO
+    def PlayerExchangeItem(self, player1, player2, player1_given_item, player2_give_item):
+        return
 
     def AllPlayerEpinephrineFade(self):
         for player in self.players_:
@@ -191,6 +223,7 @@ class Game:
                     player.UseItem("epinephrine")
                     player.consumeEpinephrine()
 
+    # TODO: add output string in every calculation step, for moderator usage.
     def ShowResults(self):
         print("\n Result of round ", self.round_count_)
         for player in self.players_:
