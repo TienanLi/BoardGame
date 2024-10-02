@@ -40,12 +40,29 @@ class Room:
         self.player_in_.remove(player)
 
     def TriggerFight(self):
-        # TODO: operation room mechanism.
-        if self.HasAnyoneHasGun():
+        print(self.level_, self.room_num_, self.CountHuman())
+        if (self.level_ == -2) and (self.room_num_ == 2) and (self.CountHuman() == 2):
+            # Special logic for the operation room.
+            print("opration")
+            self.Operation()
+        elif self.HasAnyoneHasGun():
             self.HumanBrawlWithGun()
         else:
+            print("fight")
             self.HumanBrawlWithoutGun()
         self.GhostBloodSucking()
+
+    def CountHuman(self):
+        count = 0
+        for player in self.player_in_:
+            if not player.is_ghost_:
+                count += 1
+        return count
+
+    def Operation(self):
+        for player in self.player_in_:
+            if not player.is_ghost_:
+                player.IncreaseLife(4)
 
     def HasAnyoneHasGun(self):
         for player in self.player_in_:
@@ -183,7 +200,6 @@ class GameMap:
 
     def TriggerFight(self):
         for _, room in self.room_list_.items():
-            # TODO: exclude operating room
             room.TriggerFight()
 
     def PlayerHurtByToxicGas(self, toxic_strength):

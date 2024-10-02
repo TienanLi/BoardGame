@@ -41,17 +41,19 @@ class Player:
 
     def ReduceLife(self, num_reduced):
         self.life_ -= num_reduced
-        if self.use_epinephrine_:
-            self.life_ = max(1, self.life_)
-        # TODO: ghost location reset mechanism.
-        if self.life_ <= 0:
-            self.is_ghost_ = True
-            self.life_ = 0
 
     def IncreaseLife(self, num_increased):
         self.life_ += num_increased
+
+    def FinalizeLife(self):
+        if self.use_epinephrine_:
+            self.life_ = max(1, self.life_)
+        self.life_ = max(0, self.life_)
         self.life_ = min(self.life_, 10)
-        if (self.is_ghost_ == True and self.life_ >= 2):
+        # TODO: ghost location reset mechanism.
+        if self.life_ == 0:
+            self.is_ghost_ = True
+        elif self.is_ghost_ == True and self.life_ >= 2:
             self.is_ghost_ = False
 
     def ItemIdxInBag(self, item_name):

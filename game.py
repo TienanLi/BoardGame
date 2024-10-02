@@ -49,7 +49,7 @@ class Game:
     def Proceed(self):
         while self.round_count_ < 6:
             # Initial round 0
-            if (self.round_count_ == 0):
+            if self.round_count_ == 0:
                 self.SelectPlayerBornLocation()
                 self.GetRoundResults()
             self.ProcceedOneRound()
@@ -86,7 +86,7 @@ class Game:
                     break
                 player.PickItem(item_name)
 
-            # TODO: player use special item.
+            # Player use special item.
             if player.ItemInBag("bazooka"):
                 target_level = input("Decide your target attack level: ")
                 target_room_num = input("Decide your target attack room num: ")
@@ -101,7 +101,6 @@ class Game:
             self.vote_count_for_toxic_[level] += 1
         # Epinephrine faded our after the player moves.
         self.AllPlayerEpinephrineFade()
-
         # Make some levels filled with toxic gas.
         self.ToxifySomeLevels()
 
@@ -139,11 +138,15 @@ class Game:
             self.map_.RoomAttackedByBazooka(self.bazooka_level_and_room_num_)
 
         # Trigger fights (human and ghost) and update player information if players are in the same room.
-        # note: trigger fight at the end so ghost is not changed until the end, thus not impacted by any physical
-        # hurts in this round (e.g. toxic gas, bazooka).
         self.map_.TriggerFight()
 
+        self.FinalizeAllPlayersStatus()
+
         self.ShowResults()
+
+    def FinalizeAllPlayersStatus(self):
+        for player in self.players_:
+            player.FinalizeLife()
 
     def WaterAndFood(self):
         for player in self.players_:
