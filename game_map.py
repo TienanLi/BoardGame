@@ -1,3 +1,4 @@
+from ctypes.wintypes import tagMSG
 from enum import Enum
 
 class RoomType(Enum):
@@ -5,11 +6,13 @@ class RoomType(Enum):
     BORN_ROOM = 1
     OPERATING_ROOM = 2
     HELICOPTER_STATION = 3
+    DEATH_ROOM = 4
     # TODO: add more types
 
 kSpecialRoomDict = {(-2, 202): RoomType.OPERATING_ROOM, (2, 202): RoomType.HELICOPTER_STATION,
                     (-1, 103): RoomType.BORN_ROOM, (-3, 303): RoomType.BORN_ROOM, (-4, 402): RoomType.BORN_ROOM,
-                    (-6, 603): RoomType.BORN_ROOM, (-3, 307): RoomType.BORN_ROOM, (1, 103): RoomType.BORN_ROOM}
+                    (-6, 603): RoomType.BORN_ROOM, (-3, 307): RoomType.BORN_ROOM, (1, 103): RoomType.BORN_ROOM,
+                    (-7, 701): RoomType.DEATH_ROOM}
 
 class Room:
     def __init__(self, level, room_num):
@@ -40,15 +43,12 @@ class Room:
         self.player_in_.remove(player)
 
     def TriggerFight(self):
-        print(self.level_, self.room_num_, self.CountHuman())
         if (self.type_ == RoomType.OPERATING_ROOM) and (self.CountHuman() == 2):
             # Special logic for the operation room.
-            print("opration")
             self.Operation()
         elif self.HasAnyoneHasGun():
             self.HumanBrawlWithGun()
         else:
-            print("fight")
             self.HumanBrawlWithoutGun()
         self.GhostBloodSucking()
 
@@ -130,6 +130,7 @@ class GameMap:
         print("Level: ", level, " Room: ", room)
         return level, room
 
+    # TODO: move the following two functions to a MapGenerator class, it can be an offline tool.
     # TODO: build adjacent matrix to determine the distance of rooms automatically (and add auto step num judgement).
     # Also need to consider epinephrine in the step judge.
     # create the adjacent matrix for rooms and the distance between rooms.
@@ -197,6 +198,9 @@ class GameMap:
         self.room_list_[target_level_and_num].PlayerJoin(player)
         player.location_ = target_level_and_num
         return True
+
+    def PlayerMoveToDeathRoom(self, player):
+        self.PlayerMove(player, (-7, 701))
 
     def TriggerFight(self):
         for _, room in self.room_list_.items():

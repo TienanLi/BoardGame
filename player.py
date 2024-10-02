@@ -16,6 +16,10 @@ class Player:
     def StatusString(self):
         print("Player ", self.name_, " current life ", self.life_, " and is a ", "ghost" if self.is_ghost_ else "human")
 
+    # TODO: add recycling mechanism.
+    def CleanBag(self):
+        self.bag_ = []
+
     def GeneUpgrade(self):
         self.power_ += 1
         self.movement_ += 1
@@ -45,16 +49,19 @@ class Player:
     def IncreaseLife(self, num_increased):
         self.life_ += num_increased
 
+    # Updates the status of a player. Returns True if the player becomes ghost in this run and needs to be moved
+    # to the death room.
     def FinalizeLife(self):
         if self.use_epinephrine_:
             self.life_ = max(1, self.life_)
         self.life_ = max(0, self.life_)
         self.life_ = min(self.life_, 10)
-        # TODO: ghost location reset mechanism.
         if self.life_ == 0:
             self.is_ghost_ = True
-        elif self.is_ghost_ == True and self.life_ >= 2:
+            return True
+        if self.is_ghost_ == True and self.life_ >= 2:
             self.is_ghost_ = False
+        return False
 
     def ItemIdxInBag(self, item_name):
         for i in range(len(self.bag_)):
@@ -67,7 +74,6 @@ class Player:
 
     def UseItem(self, item_name):
         idx = self.ItemIdxInBag(item_name)
-        # DCHECK(idx >= 0)
         self.bag_.pop(idx)
         return True
 

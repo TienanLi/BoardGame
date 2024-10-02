@@ -99,6 +99,7 @@ class Game:
                     break
                 print("This level is already filled with toxic gas. Please re-input.\n")
             self.vote_count_for_toxic_[level] += 1
+
         # Epinephrine faded our after the player moves.
         self.AllPlayerEpinephrineFade()
         # Make some levels filled with toxic gas.
@@ -146,7 +147,9 @@ class Game:
 
     def FinalizeAllPlayersStatus(self):
         for player in self.players_:
-            player.FinalizeLife()
+            if player.FinalizeLife():
+                player.CleanBag()
+                self.map_.PlayerMoveToDeathRoom(player)
 
     def WaterAndFood(self):
         for player in self.players_:
