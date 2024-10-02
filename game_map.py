@@ -41,7 +41,7 @@ class Room:
 
     def TriggerFight(self):
         print(self.level_, self.room_num_, self.CountHuman())
-        if (self.level_ == -2) and (self.room_num_ == 2) and (self.CountHuman() == 2):
+        if (self.type_ == RoomType.OPERATING_ROOM) and (self.CountHuman() == 2):
             # Special logic for the operation room.
             print("opration")
             self.Operation()

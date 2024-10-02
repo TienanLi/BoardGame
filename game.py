@@ -73,8 +73,8 @@ class Game:
             # Player moves.
             print("\n Player", player.name_)
             while True:
-                level = input("Decide your target level: ")
-                target_room_num = input("Decide your target room num: ")
+                room = input("Decide your target room: ").lower()
+                level, target_room_num = self.map_.ParseRoomString(room)
                 if self.map_.PlayerMove(player, (level, target_room_num)):
                     break
 
@@ -88,9 +88,9 @@ class Game:
 
             # Player use special item.
             if player.ItemInBag("bazooka"):
-                target_level = input("Decide your target attack level: ")
-                target_room_num = input("Decide your target attack room num: ")
-                self.bazooka_level_and_room_num_ = (target_level, target_room_num)
+                room = input("Decide your target attack room num using bazooka: ").lower()
+                level, target_room_num = self.map_.ParseRoomString(room)
+                self.bazooka_level_and_room_num_ = (level, target_room_num)
 
             # Vote for toxicant level.
             while True:
