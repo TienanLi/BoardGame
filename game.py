@@ -20,7 +20,7 @@ class Game:
     def GeneratePlayers(self):
         player_num = input("Enter the player num: ")
         self.players_ = []
-        for i in range(player_num):
+        for i in range(int(player_num)):
             print("\nPlayer", i, " please input your initial gene." )
             name = input("Enter your name: ")
             while True:
@@ -43,8 +43,7 @@ class Game:
             born_level_num, born_room_num = self.map_.ParseRoomString(born_room)
             while not self.map_.RoomIsBornRoom((born_level_num, born_room_num)):
                 born_room = input("Invalid born room. Please re-enter your born room: ").lower()
-            # parse the level of the room
-            born_level_num, born_room_num = self.map_.ParseRoomString(born_room)
+                born_level_num, born_room_num = self.map_.ParseRoomString(born_room)
             self.map_.PlayerBorn(player, (born_level_num, born_room_num))
 
     def Proceed(self):

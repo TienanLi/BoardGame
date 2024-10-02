@@ -7,20 +7,28 @@ class RoomType(Enum):
     HELICOPTER_STATION = 3
     # TODO: add more types
 
+kSpecialRoomDict = {(-2, 202): RoomType.OPERATING_ROOM, (2, 202): RoomType.HELICOPTER_STATION,
+                    (-1, 103): RoomType.BORN_ROOM, (-3, 303): RoomType.BORN_ROOM, (-4, 402): RoomType.BORN_ROOM,
+                    (-6, 603): RoomType.BORN_ROOM, (-3, 307): RoomType.BORN_ROOM, (1, 103): RoomType.BORN_ROOM}
+
 class Room:
     def __init__(self, level, room_num):
         self.level_ = level
         self.room_num_ = room_num
-        # Helicopter station is auto anti-toxic
-        self.is_anti_toxic_ = True if (level == 2 and room_num == 2) else False
         self.player_in_ = []
         self.item_in_ = []
-        self.type_ = RoomType.NO_TYPE
+        self.type_ = self.AssignRoomType((level, room_num))
+        self.is_anti_toxic_ = True if self.type_ == RoomType.HELICOPTER_STATION else False
         # i need a map that maps the room index to the room level and room number
         self.room_index2levelroom_map_ = {}
         self.room_levelroom2index_map_ = {}
         # i need a map that maps the room index to the room object
         self.room_levelroom2object_map_ = {}
+
+    def AssignRoomType(self, level_and_num):
+        if level_and_num in kSpecialRoomDict:
+            return kSpecialRoomDict[level_and_num]
+        return RoomType.NO_TYPE
 
     def MakeAntiToxic(self):
         self.is_anti_toxic_ = True
@@ -87,7 +95,7 @@ class GameMap:
     def RoomIsBornRoom(self, level_and_num):
         if level_and_num not in self.room_list_:
             self.room_list_[level_and_num] = Room(level_and_num[0], level_and_num[1])
-        self.room_list_[level_and_num].type_ = RoomType.BORN_ROOM
+        return self.room_list_[level_and_num].type_ == RoomType.BORN_ROOM
 
     def PlayerBorn(self, player, level_and_num):
         if level_and_num not in self.room_list_:
