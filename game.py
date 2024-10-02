@@ -14,6 +14,7 @@ class Game:
         self.toxic_strengths_ = [0, 1, 2, 2, 3, 3, 4]
         # for recycling machine.
         self.used_consumables = []
+        self.bazooka_level_and_room_num_ = None
 
     def GeneratePlayers(self, player_num):
         self.players_ = []
