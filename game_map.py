@@ -121,13 +121,14 @@ class GameMap:
         player.location_ = level_and_num
 
     def ParseRoomString(self, room_input_str):
+        if not room_input_str:
+            return None, None
         if room_input_str[0].isdigit():
             level = int(room_input_str[0])
             room  = int(room_input_str)
         else:
             level = -int(room_input_str[1])
             room  = int(room_input_str[1:])
-        print("Level: ", level, " Room: ", room)
         return level, room
 
     # TODO: move the following two functions to a MapGenerator class, it can be an offline tool.

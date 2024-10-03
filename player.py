@@ -14,7 +14,9 @@ class Player:
         self.location_ = None
 
     def StatusString(self):
-        print("Player ", self.name_, " current life ", self.life_, " and is a ", "ghost" if self.is_ghost_ else "human")
+        print(f"Player {self.name_} current life {self.life_} and is a",
+              "ghost." if self.is_ghost_ else "human.", f"In room {self.location_[1]}.",
+              "In their bag:", [item.name_ for item in self.bag_])
 
     # TODO: add recycling mechanism.
     def CleanBag(self):
@@ -77,12 +79,12 @@ class Player:
         self.bag_.pop(idx)
         return True
 
-    def PickItem(self, item_name):
+    def PickItem(self, item_name, allow_exceeding_limit=False):
         if item_name not in kItemList:
             print("Not a legal item name. See the full item list:")
             print(kItemList)
             return
-        if len(self.bag_) == self.bag_size_:
+        if not allow_exceeding_limit and len(self.bag_) >= self.bag_size_:
             print("Bag is already full. Can not pick this one.\n")
             return
         self.bag_.append(Item(item_name))

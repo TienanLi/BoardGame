@@ -18,16 +18,25 @@ class Game:
         self.bazooka_level_and_room_num_ = None
 
     def GeneratePlayers(self):
-        player_num = input("Enter the player num: ")
+        while True:
+            player_num = input("Enter the player num: ")
+            try:
+                player_num = int(player_num)
+                break
+            except:
+                continue
         self.players_ = []
-        for i in range(int(player_num)):
+        for i in range(player_num):
             print("\nPlayer", i, " please input your initial gene." )
             name = input("Enter your name: ")
             while True:
-                power = int(input("Decide your power capability: "))
-                movement = int(input("Decide your movement capability: "))
-                bag_size = int(input("Decide your bag size: "))
-                if power + movement + bag_size == 10:
+                power = input("Decide your power capability: ")
+                movement = input("Decide your movement capability: ")
+                bag_size = input("Decide your bag size: ")
+                if not power or not movement or not bag_size:
+                    print("Re-enter.")
+                    continue
+                if int(power) + int(movement) + int(bag_size) == 10:
                     break
                 print("Sum is not 10. Please re-input.\n")
             self.players_.append(Player(name, int(power), int(movement), int(bag_size)))
@@ -70,30 +79,9 @@ class Game:
         for player in self.players_:
             print("\n Player", player.name_)
 
-            # TODO: make it a stand-alone/jump-in section?
             # Report the item exchanges.
-            while True:
-                has_item_reported = input("Do you want to report any item exchange?")
-                if not has_item_reported:
-                    break
-                while True:
-                    exchange_type = input("Do you want to report give/receive/exchange?").lower()
-                    # TODO: add anti-duplication mechanism.
-                    if exchange_type == "give":
-                        to_player = input("To whom?")
-                        item = input("What item?")
-                        self.PlayerGiveItem(player, to_player, item)
-                    elif exchange_type == "receive":
-                        from_player= input("From whom?")
-                        item = input("What item?")
-                        self.PlayerGiveItem(from_player, player, item)
-                    elif exchange_type == "exchange":
-                        exchange_player= input("With whom?")
-                        item_give = input("What item you give?")
-                        item_receive = input("What item you receive?")
-                        self.PlayerExchangeItem(player, exchange_player, item_give, item_receive)
-                    else:
-                        print("Please input one of the exchange types.")
+            if self.round_count_ > 1:
+                self.ReportItemChange(player)
 
             # Player moves.
             while True:
@@ -119,7 +107,7 @@ class Game:
             # Vote for toxicant level.
             while True:
                 level = input("Vote for the level you want to toxify: ")
-                if level not in self.map_.toxicant_level_:
+                if level is not None and level not in self.map_.toxicant_level_:
                     break
                 print("This level is already filled with toxic gas. Please re-input.\n")
             self.vote_count_for_toxic_[level] += 1
@@ -129,13 +117,66 @@ class Game:
         # Make some levels filled with toxic gas.
         self.ToxifySomeLevels()
 
-    # TODO
-    def PlayerGiveItem(self, from_player, to_player, item):
-        return
+    def GetPlayer(self, player_name):
+        for player in self.players_:
+            if player.name_ == player_name:
+                return player
+        return None
 
-    # TODO
+    # TODO: make it a stand-alone/jump-in section?
+    def ReportItemChange(self, player):
+        while True:
+            exchange_type = input("Do you want to report give/receive/exchange (please input one of the type)?")
+            # TODO: add anti-duplication (aka. two player both reported the same thing) mechanism.
+            if not exchange_type:
+                return
+            elif exchange_type == "give":
+                to_player = input("To whom?")
+                item = input("What item?")
+                self.PlayerGiveItem(player, self.GetPlayer(to_player), item)
+            elif exchange_type == "receive":
+                from_player = input("From whom?")
+                item = input("What item?")
+                self.PlayerGiveItem(self.GetPlayer(from_player), player, item)
+            elif exchange_type == "exchange":
+                exchange_player = input("With whom?")
+                item_give = input("What item you give?")
+                item_receive = input("What item you receive?")
+                self.PlayerExchangeItem(player, self.GetPlayer(exchange_player), item_give, item_receive)
+            else:
+                print("Please input one of the exchange types.")
+
+    def PlayerGiveItem(self, from_player, to_player, item):
+        if not from_player or not to_player:
+            print("Player name does not exist.")
+            return
+        if from_player == to_player:
+            print("You are giving items to yourself.")
+        if not from_player.ItemInBag(item):
+            print(item, " not in ", from_player.name_, "'s bag.")
+            return
+        if len(to_player.bag_) >= to_player.bag_size_:
+            print(to_player.name_, "'s bag is full.")
+            return
+        from_player.UseItem(item)
+        to_player.PickItem(item)
+
     def PlayerExchangeItem(self, player1, player2, player1_given_item, player2_give_item):
-        return
+        if not player1 or not player2:
+            print("Player name does not exist.")
+            return
+        if player1 == player2:
+            print("You are exchanging items with yourself.")
+        if not player1.ItemInBag(player1_given_item):
+            print(player1_given_item, " not in ", player1.name_, "'s bag.")
+            return
+        if not player2.ItemInBag(player2_give_item):
+            print(player2_give_item, " not in ", player2.name_, "'s bag.")
+            return
+        player1.UseItem(player1_given_item)
+        player2.PickItem(player1_given_item, allow_exceeding_limit=True)
+        player2.UseItem(player2_give_item)
+        player1.PickItem(player2_give_item)
 
     def AllPlayerEpinephrineFade(self):
         for player in self.players_:
@@ -157,6 +198,7 @@ class Game:
 
     def GetRoundResults(self):
         if self.round_count_ != 0:
+            # TODO: add alcohol.
             # Water and Food. (Input)
             if self.round_count_ >= 2:
                 self.WaterAndFood()
