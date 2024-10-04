@@ -43,6 +43,8 @@ class Player:
         self.use_epinephrine_ = True
 
     def EpinephrineFade(self):
+        if self.use_epinephrine_:
+            print(f"===PUBLIC NEWS: epinephrine faded upon player {self.name_}.===")
         self.use_epinephrine_ = False
 
     def ReduceLife(self, num_reduced):
@@ -60,8 +62,10 @@ class Player:
         self.life_ = min(self.life_, 10)
         if self.life_ == 0:
             self.is_ghost_ = True
+            print(f"===PUBLIC NEWS: {self.name_} dies and becomes a ghost.===")
             return True
         if self.is_ghost_ == True and self.life_ >= 2:
+            print(f"===PUBLIC NEWS: {self.name_} relive with {self.life_} life.===")
             self.is_ghost_ = False
         return False
 
@@ -88,6 +92,7 @@ class Player:
             print("Bag is already full. Can not pick this one.\n")
             return
         self.bag_.append(Item(item_name))
+        print(f"===PUBLIC NEWS: {self.name_} pick item {item_name}.===")
 
     def PowerWithWeapon(self):
         temp_power = self.power_

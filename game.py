@@ -160,23 +160,26 @@ class Game:
             return
         from_player.UseItem(item)
         to_player.PickItem(item)
+        print(f"===PRIVATE NEWS: {from_player.name_} gives item {item} to {to_player.name_}.===")
 
-    def PlayerExchangeItem(self, player1, player2, player1_given_item, player2_give_item):
+    def PlayerExchangeItem(self, player1, player2, player1_give_item, player2_give_item):
         if not player1 or not player2:
             print("Player name does not exist.")
             return
         if player1 == player2:
             print("You are exchanging items with yourself.")
-        if not player1.ItemInBag(player1_given_item):
-            print(player1_given_item, " not in ", player1.name_, "'s bag.")
+        if not player1.ItemInBag(player1_give_item):
+            print(player1_give_item, " not in ", player1.name_, "'s bag.")
             return
         if not player2.ItemInBag(player2_give_item):
             print(player2_give_item, " not in ", player2.name_, "'s bag.")
             return
-        player1.UseItem(player1_given_item)
-        player2.PickItem(player1_given_item, allow_exceeding_limit=True)
+        player1.UseItem(player1_give_item)
+        player2.PickItem(player1_give_item, allow_exceeding_limit=True)
         player2.UseItem(player2_give_item)
         player1.PickItem(player2_give_item)
+        print(f"===PRIVATE NEWS: {player1.name_} gives item {player1_give_item} to {player2.name_}.===")
+        print(f"===PRIVATE NEWS: {player2.name_} gives item {player2_give_item} to {player1.name_}.===")
 
     def AllPlayerEpinephrineFade(self):
         for player in self.players_:
@@ -237,17 +240,20 @@ class Game:
                 if use_water_and_food:
                     player.IncreaseLife(2)
                     player.UseItem("water_and_food")
+                    print(f"===PUBLIC NEWS: {player.name_} submits a water_and_food.===")
             # Regular version.
             if not use_water_and_food and player.ItemInBag("water"):
                 use_water = input("Do you want to use water? (Press enter to skip)")
                 if use_water:
                     player.IncreaseLife(1)
                     player.UseItem("water")
+                    print(f"===PUBLIC NEWS: {player.name_} submits a water.===")
             if not use_water_and_food and player.ItemInBag("food"):
                 use_food = input("Do you want to use food? (Press enter to skip)")
                 if use_food:
                     player.IncreaseLife(1)
                     player.UseItem("food")
+                    print(f"===PUBLIC NEWS: {player.name_} submits a food.===")
 
     def PillAndEpinephrine(self):
         for player in self.players_:
@@ -259,11 +265,13 @@ class Game:
                 if use_pill:
                     player.IncreaseLife(2)
                     player.UseItem("pill")
+                    print(f"===PUBLIC NEWS: {player.name_} uses a pill.===")
             if player.ItemInBag("epinephrine"):
                 use_epinephrine = input("Do you want to use epinephrine? (Press enter to skip)")
                 if use_epinephrine:
                     player.UseItem("epinephrine")
                     player.consumeEpinephrine()
+                    print(f"===PUBLIC NEWS: {player.name_} uses am epinephrine.===")
 
     # TODO: add output string in every calculation step, for moderator usage.
     def ShowResults(self):
@@ -273,7 +281,7 @@ class Game:
         level_string = ""
         for level in self.map_.toxicant_level_:
             level_string += level + " "
-        print("Toxic gas are filled in level: ", level_string)
+        print(f"===PUBLIC NEWS: Toxic gas are filled in level: {level_string}.===")
 
 
 if __name__ == '__main__':

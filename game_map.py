@@ -33,16 +33,23 @@ class Room:
             return kSpecialRoomDict[level_and_num]
         return RoomType.NO_TYPE
 
+    # TODO: add control room mechanism.
     def MakeAntiToxic(self):
         self.is_anti_toxic_ = True
+        print(f"===PRIVATE NEWS: {self.room_num_} at level {self.level_} is now anti-toxic.===")
 
     def PlayerJoin(self, player):
         self.player_in_.append(player)
+        print(f"===PRIVATE NEWS: {player.name_} join {self.room_num_} at level {self.level_}.===")
 
     def PlayerLeft(self, player):
         self.player_in_.remove(player)
+        print(f"===PRIVATE NEWS: {player.name_} left {self.room_num_} at level {self.level_}.===")
 
     def TriggerFight(self):
+        if len(self.player_in_) <= 1:
+            return
+        self.GhostBloodSucking()
         if (self.type_ == RoomType.OPERATING_ROOM) and (self.CountHuman() == 2):
             # Special logic for the operation room.
             self.Operation()
@@ -50,7 +57,6 @@ class Room:
             self.HumanBrawlWithGun()
         else:
             self.HumanBrawlWithoutGun()
-        self.GhostBloodSucking()
 
     def CountHuman(self):
         count = 0
@@ -60,9 +66,12 @@ class Room:
         return count
 
     def Operation(self):
+        debug = []
         for player in self.player_in_:
             if not player.is_ghost_:
                 player.IncreaseLife(4)
+                debug.append(player.name_)
+        print(f"===PRIVATE NEWS: operation occurs and adds 4 life for both {debug[0]} and {debug[1]}.===")
 
     def HasAnyoneHasGun(self):
         for player in self.player_in_:
@@ -71,37 +80,65 @@ class Room:
         return False
 
     def HumanBrawlWithGun(self):
+        print(f"===PRIVATE NEWS: {self.room_num_} at level {self.level_} has a fight involving gun.===")
         player_with_gun = []
         for player in self.player_in_:
             if player.HasGun():
                 player_with_gun.append(player)
         highest_power = 0
+        highest_power_player = []
         for player in player_with_gun:
-            highest_power = max(highest_power, player.PowerWithWeapon())
+            if player.PowerWithWeapon() > highest_power:
+                highest_power = player.PowerWithWeapon()
+                highest_power_player = [player]
+            elif player.PowerWithWeapon() == highest_power:
+                highest_power_player.append(player)
+        print("===PRIVATE NEWS: highest power man with gun are", [player.name_ for play in highest_power_player],
+              f"with {highest_power} power.===")
         for player in self.player_in_:
             if player.is_ghost_:
                 continue
-            player.ReduceLife(highest_power - (player.PowerWithWeapon() if player.HasGun() else 0))
+            player_power = player.PowerWithWeapon() if player.HasGun() else 0
+            player_lose = highest_power - player_power
+            player.ReduceLife(player_lose)
+            print(f"===PRIVATE NEWS: {player.name_} loses {player_lose} life",
+                  "without gun.===" if player_power == 0 else "with gun.===")
 
     def HumanBrawlWithoutGun(self):
+        print(f"===PRIVATE NEWS: {self.room_num_} at level {self.level_} has a fight not involving gun.===")
         highest_power = 0
+        highest_power_player = []
         for player in self.player_in_:
             if player.is_ghost_:
                 continue
-            highest_power = max(highest_power, player.PowerWithWeapon())
+            if player.PowerWithWeapon() > highest_power:
+                highest_power = player.PowerWithWeapon()
+                highest_power_player = [player]
+            elif player.PowerWithWeapon() == highest_power:
+                highest_power_player.append(player)
+        print("===PRIVATE NEWS: highest power man are", [player.name_ for play in highest_power_player],
+              f"with {highest_power} power.===")
         for player in self.player_in_:
             if player.is_ghost_:
                 continue
-            player.ReduceLife(highest_power - player.PowerWithWeapon())
-    
+            player_lose = highest_power - player.PowerWithWeapon()
+            player.ReduceLife(player_lose)
+            print(f"===PRIVATE NEWS: {player.name_} loses {player_lose} life.===")
+
     def GhostBloodSucking(self):
         ghosts = [player for player in self.player_in_ if player.is_ghost_]
         humans = [player for player in self.player_in_ if not player.is_ghost_]
-        for ghost in ghosts:
-            ghost.IncreaseLife(len(humans))
-        for human in humans:
-            human.ReduceLife(len(ghosts))
-    
+        print(f"===PRIVATE NEWS: {len(ghosts)} ghosts and {len(humans)} humans in "
+              f"{self.room_num_} at level {self.level_}.===")
+        if len(ghosts) > 0 and len(humans) > 0:
+            for ghost in ghosts:
+                ghost.IncreaseLife(len(humans))
+                print(f"===PRIVATE NEWS: ghost {ghost.name_} increases {len(humans)} life.===")
+            for human in humans:
+                human.ReduceLife(len(ghosts))
+                print(f"===PRIVATE NEWS: human {human.name_} loses {len(ghosts)} life.===")
+
+
 class GameMap:
     def __init__(self):
         self.room_list_ = {}
@@ -155,9 +192,14 @@ class GameMap:
             if level_and_num[0] in self.toxicant_level_ and not room.is_anti_toxic_:
                 for player in room.player_in_:
                     player.ReduceLife(toxic_strength)
+                    print(f"===PUBLIC NEWS: player {player.name_} hurts by toxic gas in {self.room_num_}"
+                          f"at level {self.level_} for {toxic_strength} life")
+
 
     def RoomAttackedByBazooka(self, level_and_num):
         if level_and_num not in self.room_list_:
             return
         for player in self.room_list_[level_and_num].player_in_:
             player.ReduceLife(4)
+        print(f"===PUBLIC NEWS: player {player.name_} hurts by bazooka in {self.room_num_}"
+              f"at level {self.level_} for 4 life")
