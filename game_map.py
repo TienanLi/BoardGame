@@ -7,12 +7,13 @@ class RoomType(Enum):
     OPERATING_ROOM = 2
     HELICOPTER_STATION = 3
     DEATH_ROOM = 4
+    CONTROL_ROOM = 5
     # TODO: add more types
 
 kSpecialRoomDict = {(-2, 202): RoomType.OPERATING_ROOM, (2, 202): RoomType.HELICOPTER_STATION,
                     (-1, 103): RoomType.BORN_ROOM, (-3, 303): RoomType.BORN_ROOM, (-4, 402): RoomType.BORN_ROOM,
                     (-6, 603): RoomType.BORN_ROOM, (-3, 307): RoomType.BORN_ROOM, (1, 103): RoomType.BORN_ROOM,
-                    (-7, 701): RoomType.DEATH_ROOM}
+                    (-7, 701): RoomType.DEATH_ROOM, (1, 101): RoomType.CONTROL_ROOM}
 
 class Room:
     def __init__(self, level, room_num):
@@ -33,7 +34,6 @@ class Room:
             return kSpecialRoomDict[level_and_num]
         return RoomType.NO_TYPE
 
-    # TODO: add control room mechanism.
     def MakeAntiToxic(self):
         self.is_anti_toxic_ = True
         print(f"===PRIVATE NEWS: {self.room_num_} at level {self.level_} is now anti-toxic.===")
@@ -178,6 +178,15 @@ class GameMap:
             self.room_list_[target_level_and_num] = Room(target_level_and_num[0], target_level_and_num[1])
         self.room_list_[target_level_and_num].PlayerJoin(player)
         player.location_ = target_level_and_num
+        # Special logic if player arrive in some room that requires operation.
+        # TODO: also put item lotteries here.
+        if self.room_list_[target_level_and_num].type_ == RoomType.CONTROL_ROOM:
+            input_room = input("You are in the control room. Decide a room to be anti-toxic.").lower()
+            alevel, anti_toxic_num = self.ParseRoomString(input_room)
+            anti_toxic_level_and_num = (level, anti_toxic_num)
+            if anti_toxic_level_and_num not in self.room_list_:
+                self.room_list_[anti_toxic_level_and_num] = Room(anti_toxic_level_and_num[0], anti_toxic_level_and_num[1])
+            self.room_list_[anti_toxic_level_and_num].MakeAntiToxic()
         return True
 
     def PlayerMoveToDeathRoom(self, player):
