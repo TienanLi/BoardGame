@@ -196,7 +196,7 @@ class Game:
                 most_voted_level.append(level)
 
         for level in most_voted_level:
-            self.map_.toxicant_level_.append(level)
+            self.map_.toxicant_level_.append(int(level))
 
 
     def GetRoundResults(self):
@@ -280,7 +280,7 @@ class Game:
             player.StatusString()
         level_string = ""
         for level in self.map_.toxicant_level_:
-            level_string += level + " "
+            level_string += str(level) + " "
         print(f"===PUBLIC NEWS: Toxic gas are filled in level: {level_string}.===")
 
 

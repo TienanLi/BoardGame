@@ -181,8 +181,8 @@ class GameMap:
         # Special logic if player arrive in some room that requires operation.
         # TODO: also put item lotteries here.
         if self.room_list_[target_level_and_num].type_ == RoomType.CONTROL_ROOM:
-            input_room = input("You are in the control room. Decide a room to be anti-toxic.").lower()
-            alevel, anti_toxic_num = self.ParseRoomString(input_room)
+            input_room = input("You are in the control room. Decide a room to be anti-toxic:").lower()
+            level, anti_toxic_num = self.ParseRoomString(input_room)
             anti_toxic_level_and_num = (level, anti_toxic_num)
             if anti_toxic_level_and_num not in self.room_list_:
                 self.room_list_[anti_toxic_level_and_num] = Room(anti_toxic_level_and_num[0], anti_toxic_level_and_num[1])
@@ -201,14 +201,14 @@ class GameMap:
             if level_and_num[0] in self.toxicant_level_ and not room.is_anti_toxic_:
                 for player in room.player_in_:
                     player.ReduceLife(toxic_strength)
-                    print(f"===PUBLIC NEWS: player {player.name_} hurts by toxic gas in {self.room_num_}"
-                          f"at level {self.level_} for {toxic_strength} life")
-
+                    print(f"===PUBLIC NEWS: player {player.name_} hurts by toxic gas in {room.room_num_} "
+                          f"at level {room.level_} for {toxic_strength} life")
 
     def RoomAttackedByBazooka(self, level_and_num):
         if level_and_num not in self.room_list_:
             return
-        for player in self.room_list_[level_and_num].player_in_:
+        room = self.room_list_[level_and_num]
+        for player in room.player_in_:
             player.ReduceLife(4)
-        print(f"===PUBLIC NEWS: player {player.name_} hurts by bazooka in {self.room_num_}"
-              f"at level {self.level_} for 4 life")
+            print(f"===PUBLIC NEWS: player {player.name_} hurts by bazooka in {room.room_num_}"
+                  f"at level {room.level_} for 4 life")
