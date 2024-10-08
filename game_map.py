@@ -4,14 +4,14 @@ from enum import Enum
 class RoomType(Enum):
     NO_TYPE = 0
     BORN_ROOM = 1
-    OPERATING_ROOM = 2
+    HOSPITAL = 2
     HELICOPTER_STATION = 3
     DEATH_ROOM = 4
     CONTROL_ROOM = 5
     RESTAURANT = 6
     # TODO: add more types
 
-kSpecialRoomDict = {(-2, 202): RoomType.OPERATING_ROOM, (2, 202): RoomType.HELICOPTER_STATION,
+kSpecialRoomDict = {(-2, 202): RoomType.HOSPITAL, (2, 202): RoomType.HELICOPTER_STATION,
                     (-1, 103): RoomType.BORN_ROOM, (-3, 303): RoomType.BORN_ROOM, (-4, 402): RoomType.BORN_ROOM,
                     (-6, 603): RoomType.BORN_ROOM, (-3, 307): RoomType.BORN_ROOM, (1, 103): RoomType.BORN_ROOM,
                     (-7, 701): RoomType.DEATH_ROOM, (1, 101): RoomType.CONTROL_ROOM, (-2, 204): RoomType.RESTAURANT}
@@ -49,8 +49,8 @@ class Room:
         if len(self.player_in_) <= 1:
             return
         self.GhostBloodSucking()
-        if (self.type_ == RoomType.OPERATING_ROOM) and (self.CountHuman() == 2):
-            # Special logic for the operation room.
+        if (self.type_ == RoomType.HOSPITAL) and (self.CountHuman() == 2):
+            # Special logic for the hospital room.
             self.Operation()
         elif self.HasAnyoneHasGun():
             self.HumanBrawlWithGun()
