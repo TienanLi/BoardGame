@@ -198,7 +198,11 @@ class GameMap:
 
     def PlayerHurtByToxicGas(self, toxic_strength):
         for level_and_num, room in self.room_list_.items():
-            if level_and_num[0] in self.toxicant_level_ and not room.is_anti_toxic_:
+            if level_and_num[0] in self.toxicant_level_:
+                if room.is_anti_toxic_ and len(room.player_in_) != 0:
+                    print("===PRIVATE NEWS: players ", [p.name_ for p in room.player_in_], " are not hurt because",
+                          f"room {room.room_num_} at level {room.level_} is anti-toxic.===")
+                    continue
                 for player in room.player_in_:
                     player.ReduceLife(toxic_strength)
                     print(f"===PUBLIC NEWS: player {player.name_} hurts by toxic gas in {room.room_num_} "
