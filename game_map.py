@@ -8,12 +8,13 @@ class RoomType(Enum):
     HELICOPTER_STATION = 3
     DEATH_ROOM = 4
     CONTROL_ROOM = 5
+    RESTAURANT = 6
     # TODO: add more types
 
 kSpecialRoomDict = {(-2, 202): RoomType.OPERATING_ROOM, (2, 202): RoomType.HELICOPTER_STATION,
                     (-1, 103): RoomType.BORN_ROOM, (-3, 303): RoomType.BORN_ROOM, (-4, 402): RoomType.BORN_ROOM,
                     (-6, 603): RoomType.BORN_ROOM, (-3, 307): RoomType.BORN_ROOM, (1, 103): RoomType.BORN_ROOM,
-                    (-7, 701): RoomType.DEATH_ROOM, (1, 101): RoomType.CONTROL_ROOM}
+                    (-7, 701): RoomType.DEATH_ROOM, (1, 101): RoomType.CONTROL_ROOM, (-2, 204): RoomType.RESTAURANT}
 
 class Room:
     def __init__(self, level, room_num):
@@ -40,11 +41,9 @@ class Room:
 
     def PlayerJoin(self, player):
         self.player_in_.append(player)
-        print(f"===PRIVATE NEWS: {player.name_} join {self.room_num_} at level {self.level_}.===")
 
     def PlayerLeft(self, player):
         self.player_in_.remove(player)
-        print(f"===PRIVATE NEWS: {player.name_} left {self.room_num_} at level {self.level_}.===")
 
     def TriggerFight(self):
         if len(self.player_in_) <= 1:
@@ -169,6 +168,9 @@ class GameMap:
         return level, room
 
     def PlayerMove(self, player, target_level_and_num):
+        if not target_level_and_num[0]:
+            print("Invalid room number. Please re-input.\n")
+            return False
         original_level_and_num = player.location_
         if original_level_and_num == target_level_and_num:
             print("Can not stay in the same room. Please re-input.\n")
@@ -188,6 +190,9 @@ class GameMap:
                 self.room_list_[anti_toxic_level_and_num] = Room(anti_toxic_level_and_num[0], anti_toxic_level_and_num[1])
             self.room_list_[anti_toxic_level_and_num].MakeAntiToxic()
         return True
+
+    def PlayerInRestaurant(self, player):
+        return self.room_list_[player.location_].type_ == RoomType.RESTAURANT
 
     def PlayerMoveToDeathRoom(self, player):
         self.PlayerMove(player, (-7, 701))

@@ -233,6 +233,9 @@ class Game:
             if player.is_ghost_:
                 continue
             print("\n Player", player.name_)
+            if self.map_.PlayerInRestaurant(player):
+                print(f"===PRIVATE NEWS: {player.name_} in restaurant, no need to submit water and food.===")
+                return
             # The special version from airdrop.
             use_water_and_food = False
             if player.ItemInBag("water_and_food"):
@@ -240,20 +243,22 @@ class Game:
                 if use_water_and_food:
                     player.IncreaseLife(2)
                     player.UseItem("water_and_food")
-                    print(f"===PUBLIC NEWS: {player.name_} submits a water_and_food.===")
+                    print(f"===PUBLIC NEWS: {player.name_} submits a water_and_food. Add 2 Life.===")
             # Regular version.
             if not use_water_and_food and player.ItemInBag("water"):
                 use_water = input("Do you want to use water? (Press enter to skip)")
                 if use_water:
                     player.IncreaseLife(1)
                     player.UseItem("water")
-                    print(f"===PUBLIC NEWS: {player.name_} submits a water.===")
+                    print(f"===PUBLIC NEWS: {player.name_} submits a water. Add 1 life.===")
             if not use_water_and_food and player.ItemInBag("food"):
                 use_food = input("Do you want to use food? (Press enter to skip)")
                 if use_food:
                     player.IncreaseLife(1)
                     player.UseItem("food")
-                    print(f"===PUBLIC NEWS: {player.name_} submits a food.===")
+                    print(f"===PUBLIC NEWS: {player.name_} submits a food. Add 1 life.===")
+            player.ReduceLife(2)
+            print(f"===PUBLIC NEWS: {player.name_} reduces 2 life.===")
 
     def PillAndEpinephrine(self):
         for player in self.players_:
