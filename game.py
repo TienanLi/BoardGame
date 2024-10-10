@@ -3,6 +3,7 @@ from random import shuffle
 
 from game_map import GameMap
 from player import Player
+from util import get_gene_input
 
 # Big TODO: use a graphic interface.
 class Game:
@@ -29,16 +30,7 @@ class Game:
         for i in range(player_num):
             print("\nPlayer", i, " please input your initial gene." )
             name = input("Enter your name: ")
-            while True:
-                power = input("Decide your power capability: ")
-                movement = input("Decide your movement capability: ")
-                bag_size = input("Decide your bag size: ")
-                if not power or not movement or not bag_size:
-                    print("Re-enter.")
-                    continue
-                if int(power) + int(movement) + int(bag_size) == 10:
-                    break
-                print("Sum is not 10. Please re-input.\n")
+            power, movement, bag_size= get_gene_input()
             self.players_.append(Player(name, int(power), int(movement), int(bag_size)))
 
 
@@ -107,7 +99,7 @@ class Game:
             # Vote for toxicant level.
             while True:
                 level = input("Vote for the level you want to toxify: ")
-                if level is not None and level not in self.map_.toxicant_level_:
+                if level is not None and int(level) not in self.map_.toxicant_level_:
                     break
                 print("This level is already filled with toxic gas. Please re-input.\n")
             self.vote_count_for_toxic_[level] += 1

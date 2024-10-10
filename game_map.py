@@ -1,5 +1,6 @@
-from ctypes.wintypes import tagMSG
 from enum import Enum
+
+from util import get_gene_input
 
 class RoomType(Enum):
     NO_TYPE = 0
@@ -9,12 +10,15 @@ class RoomType(Enum):
     DEATH_ROOM = 4
     CONTROL_ROOM = 5
     RESTAURANT = 6
+    OPERATION_ROOM = 7
+    LASER_ROOM = 8
     # TODO: add more types
 
 kSpecialRoomDict = {(-2, 202): RoomType.HOSPITAL, (2, 202): RoomType.HELICOPTER_STATION,
                     (-1, 103): RoomType.BORN_ROOM, (-3, 303): RoomType.BORN_ROOM, (-4, 402): RoomType.BORN_ROOM,
                     (-6, 603): RoomType.BORN_ROOM, (-3, 307): RoomType.BORN_ROOM, (1, 103): RoomType.BORN_ROOM,
-                    (-7, 701): RoomType.DEATH_ROOM, (1, 101): RoomType.CONTROL_ROOM, (-2, 204): RoomType.RESTAURANT}
+                    (-7, 701): RoomType.DEATH_ROOM, (1, 101): RoomType.CONTROL_ROOM, (-2, 204): RoomType.RESTAURANT,
+                    (-3, 304): RoomType.OPERATION_ROOM, (1, 102): RoomType.LASER_ROOM}
 
 class Room:
     def __init__(self, level, room_num):
@@ -92,7 +96,7 @@ class Room:
                 highest_power_player = [player]
             elif player.PowerWithWeapon() == highest_power:
                 highest_power_player.append(player)
-        print("===PRIVATE NEWS: highest power man with gun are", [player.name_ for play in highest_power_player],
+        print("===PRIVATE NEWS: highest power man with gun are", [p.name_ for p in highest_power_player],
               f"with {highest_power} power.===")
         for player in self.player_in_:
             if player.is_ghost_:
@@ -115,7 +119,7 @@ class Room:
                 highest_power_player = [player]
             elif player.PowerWithWeapon() == highest_power:
                 highest_power_player.append(player)
-        print("===PRIVATE NEWS: highest power man are", [player.name_ for play in highest_power_player],
+        print("===PRIVATE NEWS: highest power man are", [p.name_ for p in highest_power_player],
               f"with {highest_power} power.===")
         for player in self.player_in_:
             if player.is_ghost_:
@@ -189,6 +193,19 @@ class GameMap:
             if anti_toxic_level_and_num not in self.room_list_:
                 self.room_list_[anti_toxic_level_and_num] = Room(anti_toxic_level_and_num[0], anti_toxic_level_and_num[1])
             self.room_list_[anti_toxic_level_and_num].MakeAntiToxic()
+        elif self.room_list_[target_level_and_num].type_ == RoomType.OPERATION_ROOM:
+            print("\nYou are in the operation room. Please input the gene you want to update." )
+            while True:
+                power, movement, bag_size= get_gene_input()
+                if player.ReAssignGene(power, movement, bag_size):
+                    break
+        # Special logic is the player pass the lase room.
+        # TODO: make this automatic with the map BFS.
+        pass_by_laser_room = input("Did you pass the laser room? Y/N ").lower()
+        if pass_by_laser_room == "y":
+            player.ReduceLife(1)
+            print(f"===PRIVATE NEWS: {player.name_} loses 1 life due to passing by the laser room.===")
+
         return True
 
     def PlayerInRestaurant(self, player):
