@@ -203,8 +203,7 @@ class GameMap:
         # TODO: make this automatic with the map BFS.
         pass_by_laser_room = input("Did you pass the laser room? Y/N ").lower()
         if pass_by_laser_room == "y":
-            player.ReduceLife(1)
-            print(f"===PRIVATE NEWS: {player.name_} loses 1 life due to passing by the laser room.===")
+            player.pass_laser_room_ = True
 
         return True
 

@@ -53,11 +53,15 @@ class Game:
             if self.round_count_ == 0:
                 self.SelectPlayerBornLocation()
                 self.GetRoundResults()
+            # In Proceed:
+            # Action 0: next round. Action 1: Save, Action 2: load (save, modify, and load to conduct adjustment)
             self.ProcceedOneRound()
-            self.GetRoundResults()
         print("Game finished!")
 
     def ProcceedOneRound(self):
+        # In one round:
+        # Action 0.n: player moves -> select player
+        # Action 1: Get round result (can not do this if not all players current_round is round_count)
         self.round_count_ += 1
         # Randomly shuffle the player action order.
         shuffle(self.players_)
@@ -70,6 +74,8 @@ class Game:
         self.bazooka_level_and_room_num_ = None
         for player in self.players_:
             print("\n Player", player.name_)
+            # Update the player status to this round
+            player.current_round_ = self.round_count_
 
             # Report the item exchanges.
             if self.round_count_ > 1:
@@ -104,10 +110,7 @@ class Game:
                 print("This level is already filled with toxic gas. Please re-input.\n")
             self.vote_count_for_toxic_[level] += 1
 
-        # Epinephrine faded our after the player moves.
-        self.AllPlayerEpinephrineFade()
-        # Make some levels filled with toxic gas.
-        self.ToxifySomeLevels()
+        self.GetRoundResults()
 
     def GetPlayer(self, player_name):
         for player in self.players_:
@@ -192,6 +195,16 @@ class Game:
 
 
     def GetRoundResults(self):
+        for player in self.players_:
+            if player.current_round_ != self.round_count_:
+                print(f"Player {player.name_} has not moved in this run. Can not get round result.")
+                return False
+
+        # Epinephrine faded our after the player moves.
+        self.AllPlayerEpinephrineFade()
+        # Make some levels filled with toxic gas.
+        self.ToxifySomeLevels()
+
         if self.round_count_ != 0:
             # TODO: add alcohol.
             # Water and Food. (Input)
@@ -199,6 +212,8 @@ class Game:
                 self.WaterAndFood()
             # Pills and Epinephrine. (Input)
             self.PillAndEpinephrine()
+
+        self.PlayerHurtByPassingLaserRoom()
 
         # Toxic gas.
         self.map_.PlayerHurtByToxicGas(toxic_strength=self.toxic_strengths_[self.round_count_])
@@ -213,6 +228,13 @@ class Game:
         self.FinalizeAllPlayersStatus()
 
         self.ShowResults()
+
+    def PlayerHurtByPassingLaserRoom(self):
+        for player in self.players_:
+            if player.pass_laser_room_:
+                player.pass_laser_room_ = False
+                player.ReduceLife(1)
+                print(f"===PRIVATE NEWS: {player.name_} hurt by 1 life due to passing by the laser room.===")
 
     def FinalizeAllPlayersStatus(self):
         for player in self.players_:

@@ -12,6 +12,8 @@ class Player:
         self.use_epinephrine_ = False
         self.is_ghost_ = False
         self.location_ = None
+        self.pass_laser_room_ = False
+        self.current_round_ = 0
 
     def StatusString(self):
         print(f"Player {self.name_} current life {self.life_} and is a",
