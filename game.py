@@ -17,6 +17,7 @@ class Game:
         # for recycling machine.
         self.used_consumables = []
         self.bazooka_level_and_room_num_ = None
+        self.vote_count_for_toxic_ = defaultdict(int)
 
     def GeneratePlayers(self):
         while True:
