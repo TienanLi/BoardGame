@@ -1,4 +1,4 @@
-# Welcome to the Game! 欢迎来到《禁闭逃杀》生存游戏!
+# Welcome to the Game! 欢迎来到《禁闭逃杀》生存游戏
 
 Please checkout `docs/game_rule.pdf` for more detailed game rule (only available in CN).
 
