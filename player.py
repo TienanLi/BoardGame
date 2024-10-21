@@ -1,5 +1,6 @@
 from items import Item, kWeaponDict, kItemList
 
+
 class Player:
     # TODO: assert sum is 10
     def __init__(self, name, power, movement, bag_size):
@@ -16,9 +17,13 @@ class Player:
         self.current_round_ = 0
 
     def StatusString(self):
-        print(f"Player {self.name_} current life {self.life_} and is a",
-              "ghost." if self.is_ghost_ else "human.", f"In room {self.location_[1]}.",
-              "In their bag:", [item.name_ for item in self.bag_])
+        print(
+            f"Player {self.name_} current life {self.life_} and is a",
+            "ghost." if self.is_ghost_ else "human.",
+            f"In room {self.location_[1]}.",
+            "In their bag:",
+            [item.name_ for item in self.bag_],
+        )
 
     # TODO: add recycling mechanism.
     def CleanBag(self):
@@ -31,10 +36,14 @@ class Player:
 
     def ReAssignGene(self, power, movement, bag_size):
         if power + movement + bag_size != self.power_ + self.movement_ + self.bag_size_:
-            print("The new sum of values is not the same of the previous sum of values. Please re-input.\n")
+            print(
+                "The new sum of values is not the same of the previous sum of values. Please re-input.\n"
+            )
             return False
         if bag_size < len(self.bag_):
-            print("The new bag size is smaller than the number of item you already have in hand. Please re-input.\n")
+            print(
+                "The new bag size is smaller than the number of item you already have in hand. Please re-input.\n"
+            )
             return False
         self.power_ = power
         self.movement_ = movement
