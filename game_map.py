@@ -45,6 +45,7 @@ class Room:
         # For save, we only store their name as a identifier for reconstruction.
         for player in self.player_in_:
             flink.write('player_in: %s\n'%player.name_)
+        flink.write('------\n')
 
     def load(self, flink):
         pass

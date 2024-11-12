@@ -28,6 +28,7 @@ class Player:
         flink.write('current_round:%i\n'%self.current_round_)
         for item in self.bag_:
             flink.write('in_bag:%s\n'%item.name_)
+        flink.write('------\n')
 
     def load(self, flink):
         pass

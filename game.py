@@ -25,20 +25,20 @@ class Game:
     # TODO: think about whether we should use protobuf and naturally json?
     def save(self, save_path='save/save.txt'):
         flink = open(save_path, 'w')
-        flink.write('#GAME\n')
+        flink.write('\n#GAME\n')
         flink.write('round_count: %i\n'%(self.round_count_))
         if (self.bazooka_level_and_room_num_ is not None):
             flink.write('bazooka_level_and_room_num: %i, %i\n'%(self.bazooka_level_and_room_num_[0], self.bazooka_level_and_room_num_[1]))
-        for vote in self.vote_count_for_toxic_:
-            flink.write('vote: %i, %i\n'%(vote, self.vote_count_for_toxic_[vote]))
+        for level in self.vote_count_for_toxic_:
+            flink.write('vote: %s, %s\n'%(level, self.vote_count_for_toxic_[level]))
         # TODO: need a global status to record which player has moved in this run. Is is currently locally stored by player.current_round.
 
         # write map cache
-        flink.write('#MAP\n')
+        flink.write('\n#MAP\n')
         self.map_.save(flink)
 
         # write player cache
-        flink.write('#PLAYER\n')
+        flink.write('\n#PLAYER\n')
         for player in self.players_:
             player.save(flink)
 
