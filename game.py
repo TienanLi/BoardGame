@@ -51,12 +51,14 @@ class Game:
 
         flink.close()
 
-    def load(self, path="save/save.txt"):
+    # TODO: work on this.
+    def load(self, read_path="save/save.txt"):
+        flink = open(read_path, "r")
         # load game
         # load map (without player_in_room)
         # load player
         # reassign player to room
-        pass
+        flink.close()
 
     def GeneratePlayers(self):
         while True:
