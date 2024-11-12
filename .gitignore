@@ -385,3 +385,4 @@ $RECYCLE.BIN/
 ########### Custom Ignore Files ###########
 .idea/
 __pycache__/
+save/

@@ -24,15 +24,30 @@ class Room:
     def __init__(self, level, room_num):
         self.level_ = level
         self.room_num_ = room_num
-        self.player_in_ = []
-        self.item_in_ = []
         self.type_ = self.AssignRoomType((level, room_num))
         self.is_anti_toxic_ = True if self.type_ == RoomType.HELICOPTER_STATION else False
+        self.player_in_ = []
+
+        ####### NOT USED BELOW
+        self.item_in_ = []
         # i need a map that maps the room index to the room level and room number
         self.room_index2levelroom_map_ = {}
         self.room_levelroom2index_map_ = {}
         # i need a map that maps the room index to the room object
         self.room_levelroom2object_map_ = {}
+
+    def save(self, flink):
+        flink.write('level:%i\n'%self.level_)
+        flink.write('room_num:%i\n'%self.room_num_)
+        flink.write('type:%s\n'%self.type_)
+        flink.write('is_anti_toxic:%i\n'%self.is_anti_toxic_)
+        # TODO: need to be careful about the player reconstruction mechanism, we should construct them from the game, and only store their ref in a room.
+        # For save, we only store their name as a identifier for reconstruction.
+        for player in self.player_in_:
+            flink.write('player_in: %s\n'%player.name_)
+
+    def load(self, flink):
+        pass
 
     def AssignRoomType(self, level_and_num):
         if level_and_num in kSpecialRoomDict:
@@ -144,10 +159,21 @@ class Room:
 
 class GameMap:
     def __init__(self):
-        self.room_list_ = {}
         self.toxicant_level_ = []
+        self.room_list_ = {}
         # We only support [-9,9] levels and [00,99] rooms.`
         self.map_adj_matrix_ = {}
+
+
+    def save(self, flink):
+        for level in self.toxicant_level_:
+            flink.write('toxicant_level: %i\n'%level)
+        flink.write('##ROOM\n')
+        for level_and_num in self.room_list_:
+            self.room_list_[level_and_num].save(flink)
+
+    def load(self, flink):
+        pass
 
     def RoomIsBornRoom(self, level_and_num):
         if level_and_num not in self.room_list_:

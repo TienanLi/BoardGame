@@ -7,13 +7,30 @@ class Player:
         self.power_ = power
         self.movement_ = movement
         self.bag_size_ = bag_size
-        self.bag_ = []
         self.life_ = 10
         self.use_epinephrine_ = False
         self.is_ghost_ = False
         self.location_ = None
         self.pass_laser_room_ = False
         self.current_round_ = 0
+        self.bag_ = []
+
+    def save(self, flink):
+        flink.write('name:%s\n'%self.name_)
+        flink.write('power:%i\n'%self.power_)
+        flink.write('movement:%i\n'%self.movement_)
+        flink.write('bag_size:%i\n'%self.bag_size_)
+        flink.write('life:%i\n'%self.life_)
+        flink.write('use_epinephrine:%i\n'%self.use_epinephrine_)
+        flink.write('is_ghost:%i\n'%self.is_ghost_)
+        flink.write('location:%i, %i\n'%(self.location_[0], self.location_[1]))
+        flink.write('pass_laser_room:%i\n'%self.pass_laser_room_)
+        flink.write('current_round:%i\n'%self.current_round_)
+        for item in self.bag_:
+            flink.write('in_bag:%s\n'%item.name_)
+
+    def load(self, flink):
+        pass
 
     def StatusString(self):
         print(f"Player {self.name_} current life {self.life_} and is a",

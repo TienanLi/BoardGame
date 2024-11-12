@@ -8,16 +8,48 @@ from util import get_gene_input
 # Big TODO: use a graphic interface.
 class Game:
     def __init__(self):
-        self.map_ = GameMap()
-        # self.map_.GenerateMap()
         self.round_count_ = 0
+        self.map_ = GameMap()
+        self.players_ = []
         self.GeneratePlayers()
-        # round 0, 1, 2, 3, 4, 5, 6
-        self.toxic_strengths_ = [0, 1, 2, 2, 3, 3, 4]
-        # for recycling machine.
-        self.used_consumables = []
         self.bazooka_level_and_room_num_ = None
         self.vote_count_for_toxic_ = defaultdict(int)
+        # round 0, 1, 2, 3, 4, 5, 6
+        self.toxic_strengths_ = [0, 1, 2, 2, 3, 3, 4]
+        # TODO: for recycling machine.
+
+        ##### NOT USED BELOW
+        self.used_consumables = []
+
+    # Save game status, map status, and player status to a modifiable txt file.
+    # TODO: think about whether we should use protobuf and naturally json?
+    def save(self, save_path='save/save.txt'):
+        flink = open(save_path, 'w')
+        flink.write('#GAME\n')
+        flink.write('round_count: %i\n'%(self.round_count_))
+        if (self.bazooka_level_and_room_num_ is not None):
+            flink.write('bazooka_level_and_room_num: %i, %i\n'%(self.bazooka_level_and_room_num_[0], self.bazooka_level_and_room_num_[1]))
+        for vote in self.vote_count_for_toxic_:
+            flink.write('vote: %i, %i\n'%(vote, self.vote_count_for_toxic_[vote]))
+        # TODO: need a global status to record which player has moved in this run. Is is currently locally stored by player.current_round.
+
+        # write map cache
+        flink.write('#MAP\n')
+        self.map_.save(flink)
+
+        # write player cache
+        flink.write('#PLAYER\n')
+        for player in self.players_:
+            player.save(flink)
+
+        flink.close()
+
+    def load(self, path="save/save.txt"):
+        # load game
+        # load map (without player_in_room)
+        # load player
+        # reassign player to room
+        pass
 
     def GeneratePlayers(self):
         while True:
@@ -27,7 +59,6 @@ class Game:
                 break
             except:
                 continue
-        self.players_ = []
         for i in range(player_num):
             print("\nPlayer", i, " please input your initial gene." )
             name = input("Enter your name: ")
@@ -229,6 +260,8 @@ class Game:
         self.FinalizeAllPlayersStatus()
 
         self.ShowResults()
+        # Save currently run in ghost mode.
+        self.save()
 
     def PlayerHurtByPassingLaserRoom(self):
         for player in self.players_:
